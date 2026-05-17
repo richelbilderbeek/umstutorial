@@ -1,0 +1,13 @@
+[Unit]
+Description=Build and publish umstutorial to its webroot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=__DEPLOY_USER__
+Group=__DEPLOY_USER__
+WorkingDirectory=/srv/umstutorial
+ExecStart=/srv/umstutorial/deploy/deploy.sh
+Nice=10
+TimeoutStartSec=10min

@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly umstutorial deploy
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=timers.target

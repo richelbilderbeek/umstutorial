@@ -1,4 +1,4 @@
-# umstutorials
+# umstutorial
 
 Tutorials webb that aggregates content from multiple sources into a single bilingual (EN/SV) site with tag-based navigation.
 
@@ -54,9 +54,14 @@ The default language is set by `DEFAULT_LANG` in `tutorials.config.js`.
 build.js              # build pipeline
 template.html         # page shell
 site.css              # styles
-tutorials.config.js   # SOURCES, TAGS, TUTORIALS
+tutorials.config.js   # SOURCES, TAGS, TUTORIALS, DEFAULT_LANG
 scripts/sync-umsme.sh # umsme source loader
 content/              # locally-authored tutorials
+deploy/               # server-side auto-deploy (systemd timer)
 sources/              # gitignored — populated by sync scripts
 dist/                 # gitignored — build output
 ```
+
+## Deployment
+
+The production site at `tutorial.uppsalamakerspace.se` rebuilds hourly via a server-side systemd timer that runs `deploy/deploy.sh`. See [`deploy/README.md`](deploy/README.md) for setup and operator commands.
