@@ -1,4 +1,5 @@
-// Declares where tutorial content comes from and how it's grouped.
+// Declares where tutorial content comes from, how it's grouped, and which
+// language sits at the site root (others get a `/<lang>/` prefix).
 //
 // SOURCES: keyed by source name. `root` is where the source's tutorial tree
 // lives relative to the repo root; `screensDirs` are layered into
@@ -9,6 +10,8 @@
 //
 // TUTORIALS: ordered list. Each entry pulls {slug}.md from
 // SOURCES[source].root/{lang}/ and is grouped under `tag`.
+
+export const DEFAULT_LANG = "sv";
 
 export const SOURCES = {
   umsme: {

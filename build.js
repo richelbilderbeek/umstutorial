@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, existsSync } fr
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import MarkdownIt from "markdown-it";
-import { SOURCES, TAGS, TUTORIALS } from "./tutorials.config.js";
+import { DEFAULT_LANG, SOURCES, TAGS, TUTORIALS } from "./tutorials.config.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = __dirname;
@@ -62,16 +62,18 @@ md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
   return defaultLinkOpen(tokens, idx, options, env, self);
 };
 
-// Tutorials live at dist/{lang}/{tag}/<slug>/index.html, screens at
+// Tutorials live at dist/{langPrefix}{tag}/{slug}/index.html and screens at
 // dist/screens/<source>/. Markdown writes `../screens/foo.png` (portable
-// within a source repo); rewrite to `../../../screens/<source>/foo.png`.
+// within a source repo); rewrite to N levels of `../` (matching the
+// tutorial's depth in dist/) followed by `screens/<source>/`.
 const defaultImage =
   md.renderer.rules.image ||
   ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
 md.renderer.rules.image = (tokens, idx, options, env, self) => {
   const src = tokens[idx].attrGet("src") ?? "";
-  if (src.startsWith("../screens/") && env?.source) {
-    tokens[idx].attrSet("src", `../../../screens/${env.source}/` + src.slice("../screens/".length));
+  if (src.startsWith("../screens/") && env?.source && env?.lang) {
+    const prefix = up(pageDepth(env.lang, true, true)) + `screens/${env.source}/`;
+    tokens[idx].attrSet("src", prefix + src.slice("../screens/".length));
   }
   return defaultImage(tokens, idx, options, env, self);
 };
@@ -98,7 +100,21 @@ const otherLang = (lang) => (lang === "en" ? "sv" : "en");
 
 const tagLabel = (lang, tag) => TAGS[tag]?.[lang] ?? tag;
 
-const parseMarkdown = (source, sourceName) => {
+// URL/path helpers for the "default language at root, others under /<lang>/"
+// layout. `pageDepth` is the number of `../` hops from a page back up to the
+// dist root and drives cssUrl, image src, and other-lang hrefs.
+const langPrefix = (lang) => (lang === DEFAULT_LANG ? "" : `${lang}/`);
+const pageDepth = (lang, tag, slug) =>
+  (lang === DEFAULT_LANG ? 0 : 1) + (tag ? 1 : 0) + (slug ? 1 : 0);
+const up = (n) => "../".repeat(n);
+const urlOf = (lang, tag, slug) =>
+  langPrefix(lang) + (tag ? `${tag}/` : "") + (slug ? `${slug}/` : "");
+const otherLangUrlOf = (lang, tag, slug) =>
+  up(pageDepth(lang, tag, slug)) + urlOf(otherLang(lang), tag, slug);
+const outPath = (lang, tag, slug) =>
+  resolve(dist, ...[lang === DEFAULT_LANG ? null : lang, tag, slug].filter(Boolean), "index.html");
+
+const parseMarkdown = (source, sourceName, lang) => {
   const tokens = md.parse(source, {});
   let title = "";
   let summary = "";
@@ -126,7 +142,7 @@ const parseMarkdown = (source, sourceName) => {
       }
     }
   }
-  const html = md.render(source, { source: sourceName });
+  const html = md.render(source, { source: sourceName, lang });
   return { title, summary, html, tocItems };
 };
 
@@ -201,7 +217,7 @@ const renderBreadcrumb = (items) =>
 const tagOfSlug = (slug) => TUTORIALS.find((t) => t.slug === slug)?.tag ?? null;
 
 const renderTutorial = (lang, slug, tag, parsed) => {
-  const ol = otherLang(lang);
+  const depth = pageDepth(lang, tag, slug);
   const { tocButton, aside } = renderToc(parsed.tocItems, LANGS[lang].tocTitle);
   const breadcrumb = renderBreadcrumb([
     { text: LANGS[lang].siteTitle, href: "../../" },
@@ -213,15 +229,15 @@ const renderTutorial = (lang, slug, tag, parsed) => {
     bodyClass: "page-tutorial",
     title: parsed.title,
     breadcrumb,
-    cssUrl: "../../../site.css",
-    otherLang: ol,
+    cssUrl: up(depth) + "site.css",
+    otherLang: otherLang(lang),
     otherLangLabel: LANGS[lang].switcherLabel,
-    otherLangUrl: `../../../${ol}/${tag}/${slug}/`,
+    otherLangUrl: otherLangUrlOf(lang, tag, slug),
     tocButton,
     aside,
     content: parsed.html,
   });
-  const out = resolve(dist, lang, tag, slug, "index.html");
+  const out = outPath(lang, tag, slug);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html);
 };
@@ -241,10 +257,11 @@ const cardsHtml = (items, prefix) =>
     .join("\n");
 
 const renderTagsListing = (lang, items, currentTag) => {
-  const ol = otherLang(lang);
   const isAll = currentTag === null;
+  const tag = isAll ? null : currentTag;
   const tagText = isAll ? null : tagLabel(lang, currentTag);
   const prefix = isAll ? "" : "../";
+  const depth = pageDepth(lang, tag, null);
   const breadcrumb = isAll
     ? renderBreadcrumb([{ text: LANGS[lang].siteTitle }])
     : renderBreadcrumb([
@@ -259,39 +276,17 @@ const renderTagsListing = (lang, items, currentTag) => {
     bodyClass: "page-landing",
     title: isAll ? LANGS[lang].siteTitle : `${LANGS[lang].siteTitle} · ${tagText}`,
     breadcrumb,
-    cssUrl: isAll ? "../site.css" : "../../site.css",
-    otherLang: ol,
+    cssUrl: up(depth) + "site.css",
+    otherLang: otherLang(lang),
     otherLangLabel: LANGS[lang].switcherLabel,
-    otherLangUrl: isAll
-      ? `../${ol}/`
-      : `../../${ol}/${currentTag}/`,
+    otherLangUrl: otherLangUrlOf(lang, tag, null),
     tocButton,
     aside,
     content,
   });
-  const out = isAll
-    ? resolve(dist, lang, "index.html")
-    : resolve(dist, lang, currentTag, "index.html");
+  const out = outPath(lang, tag, null);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html);
-};
-
-const writeRedirect = (path, target) => {
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=${target}">
-  <link rel="canonical" href="${target}">
-  <title>Tutorials</title>
-</head>
-<body>
-  <p>Redirecting to <a href="${target}">${target}</a>.</p>
-</body>
-</html>
-`;
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, html);
 };
 
 // --- build ---
@@ -321,7 +316,7 @@ for (const { source, slug, tag } of TUTORIALS) {
   }
   for (const lang of ["en", "sv"]) {
     const mdSource = readFileSync(resolve(srcRoot, lang, `${slug}.md`), "utf8");
-    const parsed = parseMarkdown(mdSource, source);
+    const parsed = parseMarkdown(mdSource, source, lang);
     renderTutorial(lang, slug, tag, parsed);
     const entry = { slug, title: parsed.title, summary: parsed.summary, tag };
     allTutorialsBuilt[lang].push(entry);
@@ -335,8 +330,6 @@ for (const lang of ["en", "sv"]) {
     renderTagsListing(lang, tutorialsByTag[lang][tag] ?? [], tag);
   }
 }
-
-writeRedirect(resolve(dist, "index.html"), "sv/");
 
 // Per-source screens: layered copy into dist/screens/<source>/. Each
 // screensDir overlays the previous on name collisions; forceManual files

@@ -27,10 +27,16 @@ npm run dev
 
 `npm run sync` (= `scripts/sync-umsme.sh`) does a shallow + sparse checkout of the umsme repo into `sources/umsme/`, limited to the `tutorial/` directory. The synced commit SHA is recorded in `sources/umsme/.synced-sha`.
 
-- Re-running the sync updates to the latest `main`.
-- `scripts/sync-umsme.sh --ref <branch|tag|sha>` syncs a specific ref instead of `main`.
+- Re-running the sync updates to the latest `master`.
+- `scripts/sync-umsme.sh --ref <branch|tag|sha>` syncs a specific ref instead of `master`.
 
 `sources/` is gitignored — upstream content never enters this repo's history.
+
+## URLs
+
+Swedish is the default language and lives at the site root: `/`, `/app/`, `/app/installApp/`. English is mirrored one level deeper under `/en/`: `/en/`, `/en/app/`, `/en/app/installApp/`. The language switcher on every page links to the paired URL in the other language, so each tutorial is deep-linkable in either language.
+
+The default language is set by `DEFAULT_LANG` in `tutorials.config.js`.
 
 ## Authoring tutorials locally
 
