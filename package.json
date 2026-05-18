@@ -3,10 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "sync": "scripts/sync-umsme.sh",
-    "build": "node build.js",
-    "serve": "npx --yes http-server dist -p 8000 -c-1",
-    "dev": "npm run sync && npm run build && npm run serve"
+    "sync:umsme":  "scripts/sync-umsme.sh",
+    "sync:gdrive": "node scripts/sync-gdrive.js",
+    "sync":        "npm run sync:umsme && npm run sync:gdrive",
+    "build":       "node build.js",
+    "serve":       "npx --yes http-server dist -p 8000 -c-1",
+    "dev":         "npm run sync && npm run build && npm run serve"
   },
   "dependencies": {
     "markdown-it": "^14.1.0"

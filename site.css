@@ -222,6 +222,16 @@ a:hover { color: var(--brand-green); }
   font-size: 0.95rem;
 }
 
+.empty-listing {
+  margin: 16px 0;
+  padding: 20px 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 /* --- TOC --- */
 
 .toc {

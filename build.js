@@ -9,8 +9,26 @@ const root = __dirname;
 const dist = resolve(root, "dist");
 
 const LANGS = {
-  en: { switcherLabel: "SV", siteTitle: "Tutorials", tocTitle: "Contents", tagsTitle: "Tags", allLabel: "All" },
-  sv: { switcherLabel: "EN", siteTitle: "Guider",    tocTitle: "Innehåll", tagsTitle: "Etiketter", allLabel: "Alla" },
+  en: {
+    switcherLabel: "SV", siteTitle: "Tutorials", tocTitle: "Contents",
+    tagsTitle: "Tags", allLabel: "All",
+    otherLangName: "Swedish",
+    emptyWithSwitch: (tag, url) =>
+      `No tutorials in English yet for <em>${escapeHtml(tag)}</em>. ` +
+      `Switch to <a href="${escapeHtml(url)}">Swedish</a> to see the available tutorials.`,
+    emptyNoSwitch: (tag) =>
+      `No tutorials yet for <em>${escapeHtml(tag)}</em>.`,
+  },
+  sv: {
+    switcherLabel: "EN", siteTitle: "Guider", tocTitle: "Innehåll",
+    tagsTitle: "Etiketter", allLabel: "Alla",
+    otherLangName: "engelska",
+    emptyWithSwitch: (tag, url) =>
+      `Inga svenska guider ännu för <em>${escapeHtml(tag)}</em>. ` +
+      `Byt till <a href="${escapeHtml(url)}">engelska</a> för att se tillgängliga guider.`,
+    emptyNoSwitch: (tag) =>
+      `Inga guider ännu för <em>${escapeHtml(tag)}</em>.`,
+  },
 };
 
 // Per-source pre-flight: any source marked `requireSyncedSha` must have a
@@ -111,6 +129,10 @@ const urlOf = (lang, tag, slug) =>
   langPrefix(lang) + (tag ? `${tag}/` : "") + (slug ? `${slug}/` : "");
 const otherLangUrlOf = (lang, tag, slug) =>
   up(pageDepth(lang, tag, slug)) + urlOf(otherLang(lang), tag, slug);
+// Fallback when a tutorial is single-language: link the switcher to the
+// other-language tag listing (or root) instead of a page that doesn't exist.
+const otherLangFallbackUrlOf = (lang, tag) =>
+  up(pageDepth(lang, tag, true)) + urlOf(otherLang(lang), tag, null);
 const outPath = (lang, tag, slug) =>
   resolve(dist, ...[lang === DEFAULT_LANG ? null : lang, tag, slug].filter(Boolean), "index.html");
 
@@ -129,7 +151,15 @@ const parseMarkdown = (source, sourceName, lang) => {
       t.type === "paragraph_open" &&
       tokens[i + 1].type === "inline"
     ) {
-      summary = tokens[i + 1].content;
+      // Skip image-only paragraphs (e.g. a leading screenshot under the H1) —
+      // the listing card needs descriptive text, not the markdown of an image.
+      const inline = tokens[i + 1];
+      const textContent = (inline.children ?? [])
+        .filter((c) => c.type === "text")
+        .map((c) => c.content)
+        .join("")
+        .trim();
+      if (textContent) summary = inline.content;
     }
     if (t.type === "heading_open" && (t.tag === "h2" || t.tag === "h3")) {
       const inline = tokens[i + 1];
@@ -216,7 +246,7 @@ const renderBreadcrumb = (items) =>
 
 const tagOfSlug = (slug) => TUTORIALS.find((t) => t.slug === slug)?.tag ?? null;
 
-const renderTutorial = (lang, slug, tag, parsed) => {
+const renderTutorial = (lang, slug, tag, parsed, hasOtherLang) => {
   const depth = pageDepth(lang, tag, slug);
   const { tocButton, aside } = renderToc(parsed.tocItems, LANGS[lang].tocTitle);
   const breadcrumb = renderBreadcrumb([
@@ -232,7 +262,9 @@ const renderTutorial = (lang, slug, tag, parsed) => {
     cssUrl: up(depth) + "site.css",
     otherLang: otherLang(lang),
     otherLangLabel: LANGS[lang].switcherLabel,
-    otherLangUrl: otherLangUrlOf(lang, tag, slug),
+    otherLangUrl: hasOtherLang
+      ? otherLangUrlOf(lang, tag, slug)
+      : otherLangFallbackUrlOf(lang, tag),
     tocButton,
     aside,
     content: parsed.html,
@@ -256,7 +288,7 @@ const cardsHtml = (items, prefix) =>
     )
     .join("\n");
 
-const renderTagsListing = (lang, items, currentTag) => {
+const renderTagsListing = (lang, items, currentTag, otherLangHasItems = false) => {
   const isAll = currentTag === null;
   const tag = isAll ? null : currentTag;
   const tagText = isAll ? null : tagLabel(lang, currentTag);
@@ -270,7 +302,14 @@ const renderTagsListing = (lang, items, currentTag) => {
       ]);
   const { tocButton, aside } = renderTagFilter(lang, currentTag, prefix);
   const heading = isAll ? LANGS[lang].siteTitle : tagText;
-  const content = `<h1>${escapeHtml(heading)}</h1>\n<div class="tutorial-grid">${cardsHtml(items, prefix)}\n</div>`;
+  const body = items.length > 0
+    ? `<div class="tutorial-grid">${cardsHtml(items, prefix)}\n</div>`
+    : `<p class="empty-listing">${
+        otherLangHasItems
+          ? LANGS[lang].emptyWithSwitch(tagText ?? "", otherLangUrlOf(lang, tag, null))
+          : LANGS[lang].emptyNoSwitch(tagText ?? "")
+      }</p>`;
+  const content = `<h1>${escapeHtml(heading)}</h1>\n${body}`;
   const html = fillTemplate({
     lang,
     bodyClass: "page-landing",
@@ -308,16 +347,18 @@ for (const { source, slug, tag } of TUTORIALS) {
   }
   const srcCfg = SOURCES[source];
   const srcRoot = resolve(root, srcCfg.root);
-  const enPath = resolve(srcRoot, "en", `${slug}.md`);
-  const svPath = resolve(srcRoot, "sv", `${slug}.md`);
-  if (!existsSync(enPath) || !existsSync(svPath)) {
-    console.warn(`skip ${source}/${slug} — missing one of the languages`);
+  const available = ["en", "sv"].filter((lang) =>
+    existsSync(resolve(srcRoot, lang, `${slug}.md`)),
+  );
+  if (available.length === 0) {
+    console.warn(`skip ${source}/${slug} — no language files found`);
     continue;
   }
-  for (const lang of ["en", "sv"]) {
+  for (const lang of available) {
     const mdSource = readFileSync(resolve(srcRoot, lang, `${slug}.md`), "utf8");
     const parsed = parseMarkdown(mdSource, source, lang);
-    renderTutorial(lang, slug, tag, parsed);
+    const hasOtherLang = available.includes(otherLang(lang));
+    renderTutorial(lang, slug, tag, parsed, hasOtherLang);
     const entry = { slug, title: parsed.title, summary: parsed.summary, tag };
     allTutorialsBuilt[lang].push(entry);
     tutorialsByTag[lang][tag].push(entry);
@@ -327,7 +368,8 @@ for (const { source, slug, tag } of TUTORIALS) {
 for (const lang of ["en", "sv"]) {
   renderTagsListing(lang, allTutorialsBuilt[lang], null);
   for (const tag of Object.keys(TAGS)) {
-    renderTagsListing(lang, tutorialsByTag[lang][tag] ?? [], tag);
+    const otherLangHasItems = (tutorialsByTag[otherLang(lang)][tag] ?? []).length > 0;
+    renderTagsListing(lang, tutorialsByTag[lang][tag] ?? [], tag, otherLangHasItems);
   }
 }
 
@@ -358,5 +400,5 @@ for (const name of usedSources) {
 cpSync(resolve(root, "site.css"), resolve(dist, "site.css"));
 
 console.log(
-  `built ${allTutorialsBuilt.en.length} tutorial(s) × 2 langs → ${resolve(dist)}`,
+  `built ${allTutorialsBuilt.en.length} en + ${allTutorialsBuilt.sv.length} sv page(s) → ${resolve(dist)}`,
 );

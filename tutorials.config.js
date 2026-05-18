@@ -24,16 +24,29 @@ export const SOURCES = {
     root: "content",
     screensDirs: ["screens"],
   },
+  gdrive: {
+    root: "sources/gdrive/tutorial",
+    screensDirs: ["screens"],
+    requireSyncedSha: true,
+  },
 };
 
 export const TAGS = {
-  app: { en: "App", sv: "App" },
+  app:  { en: "Member app",    sv: "Medlemsapp" },
+  wood: { en: "Wood workshop", sv: "Träverkstad" },
 };
 
+// gdrive entries carry a `docs` map of Google Doc IDs per language. Either
+// `en`, `sv`, or both may be present — gdrive tutorials are allowed to ship
+// in a single language.
 export const TUTORIALS = [
-  { source: "umsme", slug: "installApp",      tag: "app" },
-  { source: "umsme", slug: "existingMembers", tag: "app" },
-  { source: "umsme", slug: "newMembers",      tag: "app" },
-  { source: "umsme", slug: "renewMembership", tag: "app" },
-  { source: "umsme", slug: "manageFamily",    tag: "app" },
+  { source: "umsme",  slug: "installApp",      tag: "app" },
+  { source: "umsme",  slug: "existingMembers", tag: "app" },
+  { source: "umsme",  slug: "newMembers",      tag: "app" },
+  { source: "umsme",  slug: "renewMembership", tag: "app" },
+  { source: "umsme",  slug: "manageFamily",    tag: "app" },
+  { source: "gdrive", slug: "bordsfras",       tag: "wood",
+    docs: { sv: "1ZKIZjf7V9i8bYpIoVCvN7bWZWBTNNh3uSqt3Y2GoHdw" } },
+  { source: "gdrive", slug: "bandslipen",      tag: "wood",
+    docs: { sv: "1iaDMeP2SLS92Z3N5Bexv51c_tZeQYJwaSVquJPmFxvY" } },
 ];

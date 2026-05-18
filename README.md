@@ -6,13 +6,13 @@ Tutorials webb that aggregates content from multiple sources into a single bilin
 
 - **umsme** — markdown and auto-generated screens pulled from the [`umsme`](https://github.com/uppsala-makerspace/umsme) app repo's `tutorial/` directory. Screens are produced by the app's Storybook (`tutorial/screenshot.js` inside umsme) and must stay there.
 - **local** — tutorials authored directly in this repo under `content/`.
-- **gdrive** — planned: tutorials exported from Google Drive documents.
+- **gdrive** — tutorials authored in publicly-shared Google Docs. The sync downloads each doc's markdown export, decodes its inline base64 images into `sources/gdrive/tutorial/screens/`, flattens layout-grid tables, and strips trailing version-history sections. See [`AUTHORING-GDRIVE.md`](AUTHORING-GDRIVE.md) for the author-facing format spec.
 
 ## First-time setup
 
 ```sh
 npm install
-npm run sync     # populates gitignored sources/umsme/ via shallow + sparse clone
+npm run sync     # populates gitignored sources/ (umsme shallow-clone + gdrive markdown export)
 npm run build    # writes dist/
 npm run serve    # serves dist/ at http://localhost:8000
 ```
@@ -23,12 +23,14 @@ Or run all three in order:
 npm run dev
 ```
 
-## Syncing umsme
+## Syncing
 
-`npm run sync` (= `scripts/sync-umsme.sh`) does a shallow + sparse checkout of the umsme repo into `sources/umsme/`, limited to the `tutorial/` directory. The synced commit SHA is recorded in `sources/umsme/.synced-sha`.
+`npm run sync` runs both source-specific syncs in order. You can also run them individually:
 
-- Re-running the sync updates to the latest `master`.
-- `scripts/sync-umsme.sh --ref <branch|tag|sha>` syncs a specific ref instead of `master`.
+- `npm run sync:umsme` — shallow + sparse checkout of the umsme repo into `sources/umsme/`, limited to the `tutorial/` directory. The synced commit SHA is recorded in `sources/umsme/.synced-sha`.
+  - Re-running updates to the latest `master`.
+  - `scripts/sync-umsme.sh --ref <branch|tag|sha>` syncs a specific ref instead.
+- `npm run sync:gdrive` — fetches each `{ source: "gdrive" }` tutorial in `tutorials.config.js` from Google Docs' markdown export, decodes inline base64 images, cleans the markdown (heading quirks, table flattening, trailing version-history removal), and writes to `sources/gdrive/tutorial/`. Per-doc sha256 hashes are recorded in `sources/gdrive/.synced-sha`. Each gdrive tutorial entry carries a `docs: { en?, sv? }` map of Google Doc IDs — single-language tutorials are allowed.
 
 `sources/` is gitignored — upstream content never enters this repo's history.
 
