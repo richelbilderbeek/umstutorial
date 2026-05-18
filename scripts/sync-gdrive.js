@@ -1,20 +1,31 @@
 #!/usr/bin/env node
 // Sync gdrive-sourced tutorials. For each `{ source: "gdrive" }` entry in
-// TUTORIALS, for each language in its `docs` map, fetch the Google Doc as
-// markdown, extract inline base64 images, flatten tables (Google Docs is
-// commonly used as a layout grid that doesn't survive mobile), clean up
-// heading quirks, strip trailing version-history sections/tables, and write
-// `sources/gdrive/<lang>/<slug>.md` + screens. Pure Node, no new deps.
+// TUTORIALS, for each language in its `docs` map, fetch the Google Doc twice:
+// once as markdown (for the body text + all cleanup heuristics) and once as
+// a zip (for the original-resolution images). The markdown export's inline
+// base64 images are downscaled by Google; the zip export ships the real
+// image files in an `images/` subdir. We use the zip's images and only strip
+// (don't decode) the markdown export's ref-defs.
 //
-// `sources/gdrive/.synced-sha` records sha256(raw_export) per slug-lang, so
+// Then: flatten tables (Google Docs is commonly used as a layout grid that
+// doesn't survive mobile), clean up heading quirks, strip trailing version-
+// history sections/tables, and write `sources/gdrive/tutorial/<lang>/<slug>.md`
+// + screens. Pure Node, no new npm deps. Requires the system `unzip` binary.
+//
+// `sources/gdrive/.synced-sha` records sha256(raw_md + zip) per slug-lang, so
 // build.js's requireSyncedSha gate is satisfied. Re-running the sync wipes
 // and rebuilds sources/gdrive/ to stay hermetic.
 
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import {
+  copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync,
+  rmSync, writeFileSync,
+} from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
 
 import { SOURCES, TUTORIALS } from "../tutorials.config.js";
 
@@ -52,8 +63,8 @@ if (entries.length === 0) {
   process.exit(0);
 }
 
-const exportUrl = (id) =>
-  `https://docs.google.com/document/d/${id}/export?format=md`;
+const exportUrl = (id, format) =>
+  `https://docs.google.com/document/d/${id}/export?format=${format}`;
 
 const shaMap = {};
 const failures = [];
@@ -68,13 +79,25 @@ for (const entry of entries) {
     const tag = `${slug}/${lang}`;
     try {
       console.log(`→ ${tag}  (doc ${docId})`);
-      const raw = await fetchExport(docId);
-      shaMap[`${slug}-${lang}`] = sha256(raw);
-      const cleaned = transform(raw, slug);
+      const [rawMd, rawZip] = await Promise.all([
+        fetchExport(docId),
+        fetchZip(docId),
+      ]);
+      shaMap[`${slug}-${lang}`] = sha256(rawMd, rawZip);
+      const imageMap = extractZipImages(rawZip, slug);
+      const refCount = countImageRefDefs(rawMd);
+      const bodyCount = Object.keys(imageMap).length;
+      if (refCount !== bodyCount) {
+        console.warn(
+          `  ! ${tag}: doc body has ${bodyCount} image(s), md references ${refCount} — ` +
+          `extra image(s) saved to screens/ but not displayed (likely a stray image in the doc)`,
+        );
+      }
+      const cleaned = transform(rawMd, imageMap);
       const outDir = resolve(outRoot, lang);
       mkdirSync(outDir, { recursive: true });
       writeFileSync(resolve(outDir, `${slug}.md`), cleaned);
-      console.log(`  ✓ ${lang}/${slug}.md`);
+      console.log(`  ✓ ${lang}/${slug}.md  (${Object.keys(imageMap).length} image(s))`);
     } catch (err) {
       console.error(`  ✗ ${tag}: ${err.message}`);
       failures.push({ tag, err });
@@ -93,22 +116,38 @@ console.log(`✓ gdrive synced ${Object.keys(shaMap).length} doc(s) → ${outRoo
 // ---------- pipeline ----------
 
 async function fetchExport(id) {
-  const res = await fetch(exportUrl(id), { redirect: "follow" });
+  const res = await fetch(exportUrl(id, "md"), { redirect: "follow" });
   if (!res.ok) {
     throw new Error(
-      `failed to fetch (${res.status}) — is link-share enabled (Anyone with the link → Viewer)?`,
+      `failed to fetch md (${res.status}) — is link-share enabled (Anyone with the link → Viewer)?`,
     );
   }
   return await res.text();
 }
 
-function sha256(s) {
-  return createHash("sha256").update(s).digest("hex");
+async function fetchZip(id) {
+  const res = await fetch(exportUrl(id, "zip"), { redirect: "follow" });
+  if (!res.ok) {
+    throw new Error(
+      `failed to fetch zip (${res.status}) — is link-share enabled (Anyone with the link → Viewer)?`,
+    );
+  }
+  return Buffer.from(await res.arrayBuffer());
 }
 
-function transform(raw, slug) {
-  const { text: t1, imageMap } = extractImages(raw, slug);
-  let t = rewriteImageRefs(t1, imageMap);
+// Hash both exports together so any change in either input bumps the cache.
+function sha256(...parts) {
+  const h = createHash("sha256");
+  for (const p of parts) {
+    h.update(typeof p === "string" ? Buffer.from(p, "utf8") : p);
+    h.update(Buffer.from([0]));
+  }
+  return h.digest("hex");
+}
+
+function transform(raw, imageMap) {
+  let t = stripImageRefDefs(raw);
+  t = rewriteImageRefs(t, imageMap);
   t = cleanHeadings(t);
 
   let segments = parseSegments(t);
@@ -122,28 +161,78 @@ function transform(raw, slug) {
 
 // ---------- images ----------
 
-// Reference defs in the export look like:
-//   [image1]: <data:image/png;base64,iVBOR...>
-// One per line. We decode each base64 payload to a real file in screens/, build
-// a `imageN → ../screens/<slug>-N.<ext>` map, and strip the ref-def lines from
-// the body. Image *references* (`![alt][imageN]`) are rewritten in a second
-// pass so we don't depend on ordering between the body and the ref-def block.
-function extractImages(text, slug) {
-  const imageMap = {};
-  const refRe =
-    /^\[image(\d+)\]:\s*<data:image\/(png|jpe?g|gif|webp);base64,([^>]+)>\s*$/gim;
-  const screensDir = resolve(outRoot, "screens");
+// Strip `[imageN]: <data:image/...;base64,...>` ref-def lines. We don't decode
+// the base64 — image bytes come from the zip export at original resolution.
+// The ref-defs still need to go so markdown-it doesn't try to render them.
+function stripImageRefDefs(text) {
+  return text.replace(
+    /^\[image\d+\]:\s*<data:image\/(?:png|jpe?g|gif|webp);base64,[^>]+>\s*$/gim,
+    "",
+  );
+}
 
-  const cleaned = text.replace(refRe, (_m, n, mime, b64) => {
-    const ext = mime === "jpeg" ? "jpg" : mime;
-    const filename = `${slug}-${n}.${ext}`;
-    const bytes = Buffer.from(b64, "base64");
-    writeFileSync(resolve(screensDir, filename), bytes);
-    imageMap[`image${n}`] = `../screens/${filename}`;
-    return "";
+function countImageRefDefs(text) {
+  const m = text.match(
+    /^\[image\d+\]:\s*<data:image\/(?:png|jpe?g|gif|webp);base64,[^>]+>\s*$/gim,
+  );
+  return m ? m.length : 0;
+}
+
+// Extract images from a Google Docs zip export and rename to `<slug>-N.<ext>`,
+// where N is the *markdown* reference number (image1, image2, … in body
+// document order). The zip's own image filenames (`image8.jpg`, etc.) are
+// arbitrary storage order — *not* document order — so we read the HTML inside
+// the zip and use its `<img src="images/…">` tag order, which matches the MD
+// export's body-position numbering.
+//
+// Shells out to `unzip` (no new npm deps; standard on the deploy target).
+function extractZipImages(zipBuf, slug) {
+  const screensDir = resolve(outRoot, "screens");
+  const tmp = mkdtempSync(join(tmpdir(), `gdrive-${slug}-`));
+  const zipFile = join(tmp, "doc.zip");
+  writeFileSync(zipFile, zipBuf);
+
+  try {
+    execFileSync(
+      "unzip",
+      ["-q", "-o", zipFile, "-d", tmp],
+      { stdio: ["ignore", "ignore", "pipe"] },
+    );
+  } catch (err) {
+    rmSync(tmp, { recursive: true, force: true });
+    if (err.code === "ENOENT") {
+      throw new Error("`unzip` not found — install with `apt install unzip`");
+    }
+    throw new Error(
+      `unzip failed (exit ${err.status}): ${err.stderr?.toString() || err.message}`,
+    );
+  }
+
+  const htmlName = readdirSync(tmp).find((f) => f.toLowerCase().endsWith(".html"));
+  if (!htmlName) {
+    rmSync(tmp, { recursive: true, force: true });
+    return {};
+  }
+  const html = readFileSync(join(tmp, htmlName), "utf8");
+  const bodyImages = [
+    ...html.matchAll(/<img[^>]*\bsrc="images\/(image\d+\.(?:png|jpe?g|gif|webp))"/gi),
+  ].map((m) => m[1]);
+
+  const imageMap = {};
+  bodyImages.forEach((zipFilename, idx) => {
+    const refNum = idx + 1;
+    const ext = zipFilename.split(".").pop().toLowerCase();
+    const normalizedExt = ext === "jpeg" ? "jpg" : ext;
+    const dest = `${slug}-${refNum}.${normalizedExt}`;
+    const srcPath = join(tmp, "images", zipFilename);
+    if (existsSync(srcPath)) {
+      copyFileSync(srcPath, join(screensDir, dest));
+      imageMap[`image${refNum}`] = `../screens/${dest}`;
+    }
   });
 
-  return { text: cleaned, imageMap };
+  rmSync(tmp, { recursive: true, force: true });
+  return imageMap;
 }
 
 function rewriteImageRefs(text, imageMap) {
