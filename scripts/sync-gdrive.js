@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 // Sync gdrive-sourced tutorials. For each `{ source: "gdrive" }` entry in
-// TUTORIALS, for each language in its `docs` map, fetch the Google Doc twice:
-// once as markdown (for the body text + all cleanup heuristics) and once as
-// a zip (for the original-resolution images). The markdown export's inline
-// base64 images are downscaled by Google; the zip export ships the real
-// image files in an `images/` subdir. We use the zip's images and only strip
-// (don't decode) the markdown export's ref-defs.
+// TUTORIALS, for each language in its `docs` map, fetch the Google Doc as a
+// zip (`?format=zip`) — that gives us the HTML rendering plus the original
+// image files in an `images/` subdir. We then convert the HTML to markdown
+// via turndown (with custom rules for Google's quirks) and run the existing
+// cleanup heuristics: heading cleanup, table flatten, version-history removal,
+// whitespace tidy.
 //
-// Then: flatten tables (Google Docs is commonly used as a layout grid that
-// doesn't survive mobile), clean up heading quirks, strip trailing version-
-// history sections/tables, and write `sources/gdrive/tutorial/<lang>/<slug>.md`
-// + screens. Pure Node, no new npm deps. Requires the system `unzip` binary.
+// We dropped the `?format=md` export entirely because Google silently omits
+// images that sit alone in table cells — see Bordssåg's Förberedelser table
+// where the 2nd row's images were lost. The HTML export is the authoritative
+// representation; everything we need is in it.
 //
-// `sources/gdrive/.synced-sha` records sha256(raw_md + zip) per slug-lang, so
+// Each `<img>` in the HTML body is numbered K = 1, 2, … in document order
+// and copied to `sources/gdrive/tutorial/screens/<slug>-K.<ext>`, then
+// referenced as `![alt](../screens/<slug>-K.<ext>)`. Requires the system
+// `unzip` binary.
+//
+// `sources/gdrive/.synced-sha` records sha256(zip) per slug-lang, so
 // build.js's requireSyncedSha gate is satisfied. Re-running the sync wipes
 // and rebuilds sources/gdrive/ to stay hermetic.
 
@@ -27,6 +32,8 @@ import { Buffer } from "node:buffer";
 import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 
+import TurndownService from "turndown";
+
 import { SOURCES, TUTORIALS } from "../tutorials.config.js";
 
 const META_TOKEN =
@@ -37,6 +44,11 @@ const META_TOKEN =
 // heading. Stripped during sync.
 const ORG_SUBTITLE = /^(uppsala\s*makerspace)$/i;
 
+// Internal markers used to split row/cell content inside the table rule.
+// Picked to be unlikely to appear in real document content.
+const CELL_MARKER = " CELL ";
+const ROW_MARKER = " ROW ";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 
@@ -46,9 +58,6 @@ if (!srcCfg) {
   process.exit(1);
 }
 const outRoot = resolve(root, srcCfg.root);
-// build.js reads `.synced-sha` from one level above `src.root` (the same
-// convention sync-umsme.sh follows). Keep our wipe scoped to the root parent
-// so we don't trash sibling source directories.
 const shaPath = resolve(outRoot, "..", ".synced-sha");
 const wipeDir = resolve(outRoot, "..");
 
@@ -63,11 +72,18 @@ if (entries.length === 0) {
   process.exit(0);
 }
 
-const exportUrl = (id, format) =>
-  `https://docs.google.com/document/d/${id}/export?format=${format}`;
+const exportUrl = (id) =>
+  `https://docs.google.com/document/d/${id}/export?format=zip`;
 
 const shaMap = {};
 const failures = [];
+
+// State the turndown rules read from per-conversion. Reset before each doc.
+let currentSlug = null;
+let imageCounter = 0;
+let imageCopyOps = [];
+
+const turndown = makeTurndownService();
 
 for (const entry of entries) {
   const { slug, docs } = entry;
@@ -79,25 +95,26 @@ for (const entry of entries) {
     const tag = `${slug}/${lang}`;
     try {
       console.log(`→ ${tag}  (doc ${docId})`);
-      const [rawMd, rawZip] = await Promise.all([
-        fetchExport(docId),
-        fetchZip(docId),
-      ]);
-      shaMap[`${slug}-${lang}`] = sha256(rawMd, rawZip);
-      const imageMap = extractZipImages(rawZip, slug);
-      const refCount = countImageRefDefs(rawMd);
-      const bodyCount = Object.keys(imageMap).length;
-      if (refCount !== bodyCount) {
-        console.warn(
-          `  ! ${tag}: doc body has ${bodyCount} image(s), md references ${refCount} — ` +
-          `extra image(s) saved to screens/ but not displayed (likely a stray image in the doc)`,
-        );
+      const rawZip = await fetchZip(docId);
+      shaMap[`${slug}-${lang}`] = sha256(rawZip);
+
+      const { html, tmpDir } = extractZip(rawZip, slug);
+      const md = convertHtmlToMarkdown(html, slug);
+      // Image rule recorded what to copy; do it now while tmpDir still exists.
+      const screensDir = resolve(outRoot, "screens");
+      for (const { zipFilename, destFilename } of imageCopyOps) {
+        const src = join(tmpDir, "images", zipFilename);
+        if (existsSync(src)) {
+          copyFileSync(src, join(screensDir, destFilename));
+        }
       }
-      const cleaned = transform(rawMd, imageMap);
+      rmSync(tmpDir, { recursive: true, force: true });
+
+      const cleaned = cleanup(md);
       const outDir = resolve(outRoot, lang);
       mkdirSync(outDir, { recursive: true });
       writeFileSync(resolve(outDir, `${slug}.md`), cleaned);
-      console.log(`  ✓ ${lang}/${slug}.md  (${Object.keys(imageMap).length} image(s))`);
+      console.log(`  ✓ ${lang}/${slug}.md  (${imageCopyOps.length} image(s))`);
     } catch (err) {
       console.error(`  ✗ ${tag}: ${err.message}`);
       failures.push({ tag, err });
@@ -113,20 +130,10 @@ if (failures.length > 0) {
 }
 console.log(`✓ gdrive synced ${Object.keys(shaMap).length} doc(s) → ${outRoot}`);
 
-// ---------- pipeline ----------
-
-async function fetchExport(id) {
-  const res = await fetch(exportUrl(id, "md"), { redirect: "follow" });
-  if (!res.ok) {
-    throw new Error(
-      `failed to fetch md (${res.status}) — is link-share enabled (Anyone with the link → Viewer)?`,
-    );
-  }
-  return await res.text();
-}
+// ---------- fetch & zip ----------
 
 async function fetchZip(id) {
-  const res = await fetch(exportUrl(id, "zip"), { redirect: "follow" });
+  const res = await fetch(exportUrl(id), { redirect: "follow" });
   if (!res.ok) {
     throw new Error(
       `failed to fetch zip (${res.status}) — is link-share enabled (Anyone with the link → Viewer)?`,
@@ -135,20 +142,190 @@ async function fetchZip(id) {
   return Buffer.from(await res.arrayBuffer());
 }
 
-// Hash both exports together so any change in either input bumps the cache.
-function sha256(...parts) {
-  const h = createHash("sha256");
-  for (const p of parts) {
-    h.update(typeof p === "string" ? Buffer.from(p, "utf8") : p);
-    h.update(Buffer.from([0]));
-  }
-  return h.digest("hex");
+function sha256(buf) {
+  return createHash("sha256").update(buf).digest("hex");
 }
 
-function transform(raw, imageMap) {
-  let t = stripImageRefDefs(raw);
-  t = rewriteImageRefs(t, imageMap);
-  t = cleanHeadings(t);
+function extractZip(zipBuf, slug) {
+  const tmpDir = mkdtempSync(join(tmpdir(), `gdrive-${slug}-`));
+  const zipFile = join(tmpDir, "doc.zip");
+  writeFileSync(zipFile, zipBuf);
+  try {
+    execFileSync(
+      "unzip",
+      ["-q", "-o", zipFile, "-d", tmpDir],
+      { stdio: ["ignore", "ignore", "pipe"] },
+    );
+  } catch (err) {
+    rmSync(tmpDir, { recursive: true, force: true });
+    if (err.code === "ENOENT") {
+      throw new Error("`unzip` not found — install with `apt install unzip`");
+    }
+    throw new Error(
+      `unzip failed (exit ${err.status}): ${err.stderr?.toString() || err.message}`,
+    );
+  }
+  const htmlName = readdirSync(tmpDir).find((f) => f.toLowerCase().endsWith(".html"));
+  if (!htmlName) {
+    rmSync(tmpDir, { recursive: true, force: true });
+    throw new Error("zip has no .html file — unexpected export shape");
+  }
+  const html = readFileSync(join(tmpDir, htmlName), "utf8");
+  return { html, tmpDir };
+}
+
+// ---------- HTML → markdown ----------
+
+function makeTurndownService() {
+  const td = new TurndownService({
+    headingStyle: "atx",
+    bulletListMarker: "*",
+    codeBlockStyle: "fenced",
+    emDelimiter: "*",
+    strongDelimiter: "**",
+  });
+
+  // The HTML export includes a <style> block in <head> with hundreds of lines
+  // of Google's internal CSS. turndown's default behavior emits the inner text
+  // of unrecognized tags, so without this rule the CSS lands at the top of the
+  // markdown output. Same for <script> (defensive — Google doesn't emit one).
+  td.addRule("drop-style-script", {
+    filter: ["style", "script"],
+    replacement: () => "",
+  });
+
+  // Inline comment anchor refs like <a href="#cmnt1" id="cmnt_ref1">[a]</a>.
+  // They surface as `[\[a\]](#cmnt1)` in MD and add no value to the tutorial.
+  td.addRule("drop-comment-ref", {
+    filter: (node) =>
+      node.nodeName === "A" &&
+      (node.getAttribute("href") || "").startsWith("#cmnt"),
+    replacement: () => "",
+  });
+
+  // Trailing comment-definition blocks: a <div> whose first child is
+  // <a id="cmntN" href="#cmnt_refN">[a]</a> followed by the comment body.
+  // These appear after the document content; dropping them removes the
+  // whole stale-feedback footer.
+  td.addRule("drop-comment-def", {
+    filter: (node) => {
+      if (node.nodeName !== "DIV") return false;
+      const a = node.querySelector && node.querySelector("a[id]");
+      return !!(a && /^cmnt\d+$/.test(a.getAttribute("id") || ""));
+    },
+    replacement: () => "",
+  });
+
+  // Google Docs exports the doc title as <p class="title">, not <h1>.
+  td.addRule("title-as-h1", {
+    filter: (node) =>
+      node.nodeName === "P" && hasClass(node, "title"),
+    replacement: (content) => `\n\n# ${content.trim()}\n\n`,
+  });
+
+  // <p class="subtitle"> is typically the author's org tag ("Uppsala Makerspace").
+  // Drop it — same intent as the existing ORG_SUBTITLE heading-text strip.
+  td.addRule("drop-subtitle", {
+    filter: (node) =>
+      node.nodeName === "P" && hasClass(node, "subtitle"),
+    replacement: () => "",
+  });
+
+  // Google emits <hr style="page-break-before:always;display:none;"> as a
+  // print-pagination artifact. Don't surface these as MD horizontal rules.
+  td.addRule("drop-hr", {
+    filter: "hr",
+    replacement: () => "",
+  });
+
+  // Walk images in document order, copy from the unzipped tree into screens/,
+  // and emit a ../screens/<slug>-K.<ext> reference. The counter increments as
+  // turndown walks the DOM, including images that sit inside table cells.
+  td.addRule("image-renumber", {
+    filter: "img",
+    replacement: (_content, node) => {
+      const src = node.getAttribute("src") || "";
+      const alt = cleanAltText(node.getAttribute("alt") || "");
+      if (!src.startsWith("images/")) return `![${alt}](${src})`;
+      imageCounter += 1;
+      const zipFilename = src.slice("images/".length);
+      const rawExt = zipFilename.split(".").pop().toLowerCase();
+      const ext = rawExt === "jpeg" ? "jpg" : rawExt;
+      const destFilename = `${currentSlug}-${imageCounter}.${ext}`;
+      imageCopyOps.push({ zipFilename, destFilename });
+      return `![${alt}](../screens/${destFilename})`;
+    },
+  });
+
+  // Tables: emit markers on cell/row boundaries so the table rule can split
+  // the already-converted content back into a grid. This avoids re-running
+  // turndown on cell.innerHTML (which would double-count images).
+  td.addRule("table-cell", {
+    filter: ["td", "th"],
+    replacement: (content) =>
+      content.trim().replace(/\s+/g, " ").replace(/\|/g, "\\|") + CELL_MARKER,
+  });
+  td.addRule("table-row", {
+    filter: "tr",
+    replacement: (content) => content + ROW_MARKER,
+  });
+  td.addRule("table-passthrough", {
+    filter: ["thead", "tbody", "tfoot"],
+    replacement: (content) => content,
+  });
+  td.addRule("table", {
+    filter: "table",
+    replacement: (content) => {
+      const rows = content
+        .split(ROW_MARKER)
+        .map((r) => r.split(CELL_MARKER).slice(0, -1))
+        .filter((cells) => cells.length > 0);
+      if (rows.length === 0) return "";
+      const ncols = Math.max(...rows.map((r) => r.length));
+      const pad = (r) => {
+        const c = r.slice();
+        while (c.length < ncols) c.push("");
+        return c;
+      };
+      const lines = [];
+      lines.push("| " + pad(rows[0]).join(" | ") + " |");
+      lines.push("| " + Array(ncols).fill("---").join(" | ") + " |");
+      for (let i = 1; i < rows.length; i++) {
+        lines.push("| " + pad(rows[i]).join(" | ") + " |");
+      }
+      return "\n\n" + lines.join("\n") + "\n\n";
+    },
+  });
+
+  return td;
+}
+
+function hasClass(node, cls) {
+  const raw = node.getAttribute && node.getAttribute("class");
+  if (!raw) return false;
+  return raw.split(/\s+/).includes(cls);
+}
+
+function convertHtmlToMarkdown(html, slug) {
+  currentSlug = slug;
+  imageCounter = 0;
+  imageCopyOps = [];
+  return turndown.turndown(html);
+}
+
+function cleanAltText(alt) {
+  let a = alt;
+  a = a.replace(/AI-genererat innehåll kan vara felaktigt\.?\s*$/i, "");
+  a = a.replace(/AI-generated content may be incorrect\.?\s*$/i, "");
+  a = a.replace(/[,\s]+$/, "");
+  return a.trim();
+}
+
+// ---------- markdown cleanup pipeline ----------
+
+function cleanup(md) {
+  let t = cleanHeadings(md);
+  t = dropPreTitleContent(t);
 
   let segments = parseSegments(t);
   segments = dropTrailingMetaTable(segments);
@@ -159,111 +336,28 @@ function transform(raw, imageMap) {
   return t;
 }
 
-// ---------- images ----------
-
-// Strip `[imageN]: <data:image/...;base64,...>` ref-def lines. We don't decode
-// the base64 — image bytes come from the zip export at original resolution.
-// The ref-defs still need to go so markdown-it doesn't try to render them.
-function stripImageRefDefs(text) {
-  return text.replace(
-    /^\[image\d+\]:\s*<data:image\/(?:png|jpe?g|gif|webp);base64,[^>]+>\s*$/gim,
-    "",
-  );
-}
-
-function countImageRefDefs(text) {
-  const m = text.match(
-    /^\[image\d+\]:\s*<data:image\/(?:png|jpe?g|gif|webp);base64,[^>]+>\s*$/gim,
-  );
-  return m ? m.length : 0;
-}
-
-// Extract images from a Google Docs zip export and rename to `<slug>-N.<ext>`,
-// where N is the *markdown* reference number (image1, image2, … in body
-// document order). The zip's own image filenames (`image8.jpg`, etc.) are
-// arbitrary storage order — *not* document order — so we read the HTML inside
-// the zip and use its `<img src="images/…">` tag order, which matches the MD
-// export's body-position numbering.
-//
-// Shells out to `unzip` (no new npm deps; standard on the deploy target).
-function extractZipImages(zipBuf, slug) {
-  const screensDir = resolve(outRoot, "screens");
-  const tmp = mkdtempSync(join(tmpdir(), `gdrive-${slug}-`));
-  const zipFile = join(tmp, "doc.zip");
-  writeFileSync(zipFile, zipBuf);
-
-  try {
-    execFileSync(
-      "unzip",
-      ["-q", "-o", zipFile, "-d", tmp],
-      { stdio: ["ignore", "ignore", "pipe"] },
-    );
-  } catch (err) {
-    rmSync(tmp, { recursive: true, force: true });
-    if (err.code === "ENOENT") {
-      throw new Error("`unzip` not found — install with `apt install unzip`");
-    }
-    throw new Error(
-      `unzip failed (exit ${err.status}): ${err.stderr?.toString() || err.message}`,
-    );
-  }
-
-  const htmlName = readdirSync(tmp).find((f) => f.toLowerCase().endsWith(".html"));
-  if (!htmlName) {
-    rmSync(tmp, { recursive: true, force: true });
-    return {};
-  }
-  const html = readFileSync(join(tmp, htmlName), "utf8");
-  const bodyImages = [
-    ...html.matchAll(/<img[^>]*\bsrc="images\/(image\d+\.(?:png|jpe?g|gif|webp))"/gi),
-  ].map((m) => m[1]);
-
-  const imageMap = {};
-  bodyImages.forEach((zipFilename, idx) => {
-    const refNum = idx + 1;
-    const ext = zipFilename.split(".").pop().toLowerCase();
-    const normalizedExt = ext === "jpeg" ? "jpg" : ext;
-    const dest = `${slug}-${refNum}.${normalizedExt}`;
-    const srcPath = join(tmp, "images", zipFilename);
-    if (existsSync(srcPath)) {
-      copyFileSync(srcPath, join(screensDir, dest));
-      imageMap[`image${refNum}`] = `../screens/${dest}`;
-    }
-  });
-
-  rmSync(tmp, { recursive: true, force: true });
-  return imageMap;
-}
-
-function rewriteImageRefs(text, imageMap) {
-  return text.replace(
-    /!\[([^\]]*)\]\s*\[(image\d+)\]/gi,
-    (m, alt, key) => {
-      const path = imageMap[key.toLowerCase()];
-      if (!path) return m;
-      return `![${cleanAltText(alt)}](${path})`;
-    },
-  );
-}
-
-function cleanAltText(alt) {
-  let a = alt;
-  // Strip the Google AI auto-caption suffix.
-  a = a.replace(/AI-genererat innehåll kan vara felaktigt\.?\s*$/i, "");
-  a = a.replace(/AI-generated content may be incorrect\.?\s*$/i, "");
-  a = a.replace(/[,\s]+$/, "");
-  return a.trim();
+// Drop anything that appears before the first H1. Google's HTML export often
+// includes a doc-level header div with version/update metadata (`Uppdaterades:
+// 2026-04-17`, `Bandslip … version 1.1 sida …`). If the doc has no H1, keep
+// everything — the author hasn't applied the Heading 1 style yet and we still
+// want the body to surface so they notice.
+function dropPreTitleContent(text) {
+  const lines = text.split("\n");
+  const h1Idx = lines.findIndex((l) => /^#\s+/.test(l));
+  if (h1Idx <= 0) return text;
+  return lines.slice(h1Idx).join("\n");
 }
 
 // ---------- headings ----------
 
-// Cleanup passes (per-line, no AST):
+// Cleanup passes (per-line):
 // - drop empty headings (`## ` with nothing after)
 // - unwrap whole-string bold/italic in heading text
 // - image-only heading → plain image paragraph
+// - drop the Uppsala Makerspace org subtitle if it slipped through as a heading
 // - drop initial Google-Docs-Tabs label H1 (`# Flik 1` / `# Tab 1`)
 // - keep the first remaining H1 as the title; demote later H1s to H2 so they
-//   don't break parseMarkdown's "first H1 is the title" assumption.
+//   don't break build.js's "first H1 is the title" assumption.
 function cleanHeadings(text) {
   const lines = text.split("\n");
   const out = [];
@@ -286,7 +380,6 @@ function cleanHeadings(text) {
     content = content.replace(/^_(.+)_$/, "$1").trim();
 
     if (content === "") continue;
-
     if (ORG_SUBTITLE.test(content)) continue;
 
     if (/^!\[[^\]]*\]\([^)]+\)\s*$/.test(content)) {
@@ -358,10 +451,9 @@ function serializeTable(seg) {
 }
 
 // Flatten one pipe table. The common Google-Docs-as-layout case is a 2-col
-// grid where text rows and image rows alternate by column (text1 | text2 →
-// img1 | img2 means img1 belongs to text1 and img2 to text2). For that
-// shape we walk column-major so step+screenshot pairs stay adjacent. For
-// anything else (mixed rows, wider tables) we fall back to row-major.
+// grid where text rows and image rows alternate by column. For that shape
+// we walk column-major so step+screenshot pairs stay adjacent. For anything
+// else (mixed rows, wider tables) we fall back to row-major.
 function flattenTable(seg) {
   const rows = [seg.header, ...seg.rows];
   const ncols = Math.max(...rows.map((r) => r.length));
@@ -417,7 +509,7 @@ function dropTrailingMetaSections(text) {
     }
     if (lastIdx === -1) break;
     const m = /^(#{1,3})\s+(.*)$/.exec(lines[lastIdx]);
-    if (m[1] === "#") break; // never drop the title
+    if (m[1] === "#") break;
     const heading = m[2].trim();
     if (META_TOKEN.test(heading)) {
       lines = lines.slice(0, lastIdx);

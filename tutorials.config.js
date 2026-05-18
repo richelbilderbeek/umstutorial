@@ -49,4 +49,6 @@ export const TUTORIALS = [
     docs: { sv: "1ZKIZjf7V9i8bYpIoVCvN7bWZWBTNNh3uSqt3Y2GoHdw" } },
   { source: "gdrive", slug: "bandslipen",      tag: "wood",
     docs: { sv: "1iaDMeP2SLS92Z3N5Bexv51c_tZeQYJwaSVquJPmFxvY" } },
+  { source: "gdrive", slug: "bordssag",      tag: "wood",
+    docs: { sv: "1tl-2MF4t7SjDfPqiCY4RUoeawATpwx_Nu7nJAMGkodA" } },
 ];
