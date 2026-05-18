@@ -51,11 +51,26 @@ a:hover { color: var(--brand-green); }
   color: var(--text);
 }
 
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 12px;
+  line-height: 0;
+}
+
+.site-logo img {
+  height: 32px;
+  width: 32px;
+  display: block;
+}
+
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 0.4em;
   min-width: 0;
+  flex: 1;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

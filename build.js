@@ -260,6 +260,8 @@ const renderTutorial = (lang, slug, tag, parsed, hasOtherLang) => {
     title: parsed.title,
     breadcrumb,
     cssUrl: up(depth) + "site.css",
+    faviconUrl: up(depth) + "favicon.png",
+    homeUrl: (up(depth) + langPrefix(lang)) || "./",
     otherLang: otherLang(lang),
     otherLangLabel: LANGS[lang].switcherLabel,
     otherLangUrl: hasOtherLang
@@ -316,6 +318,8 @@ const renderTagsListing = (lang, items, currentTag, otherLangHasItems = false) =
     title: isAll ? LANGS[lang].siteTitle : `${LANGS[lang].siteTitle} · ${tagText}`,
     breadcrumb,
     cssUrl: up(depth) + "site.css",
+    faviconUrl: up(depth) + "favicon.png",
+    homeUrl: (up(depth) + langPrefix(lang)) || "./",
     otherLang: otherLang(lang),
     otherLangLabel: LANGS[lang].switcherLabel,
     otherLangUrl: otherLangUrlOf(lang, tag, null),
@@ -398,6 +402,7 @@ for (const name of usedSources) {
 }
 
 cpSync(resolve(root, "site.css"), resolve(dist, "site.css"));
+cpSync(resolve(root, "assets/favicon.png"), resolve(dist, "favicon.png"));
 
 console.log(
   `built ${allTutorialsBuilt.en.length} en + ${allTutorialsBuilt.sv.length} sv page(s) → ${resolve(dist)}`,
