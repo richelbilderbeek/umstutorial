@@ -86,4 +86,7 @@ export const TUTORIALS = [
   { source: "github", slug: "prusa-install", tag: "print3d",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/0_install_and_setup_prusa_slicer" },
+  { source: "github", slug: "prusa-print", tag: "print3d",
+    repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
+    dir: "docs/chapters/1_print" },
 ];
