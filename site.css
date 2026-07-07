@@ -176,6 +176,14 @@ a:hover { color: var(--brand-green); }
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
+/* On desktop the content column is ~780px wide, so let images grow past the
+   408px cap (which stays on mobile, where the reader can pinch-to-zoom). */
+@media (min-width: 769px) {
+  .content img {
+    max-width: 680px;
+  }
+}
+
 .content code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.92em;

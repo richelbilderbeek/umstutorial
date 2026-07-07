@@ -7,6 +7,7 @@ Tutorials webb that aggregates content from multiple sources into a single bilin
 - **umsme** — markdown and auto-generated screens pulled from the [`umsme`](https://github.com/uppsala-makerspace/umsme) app repo's `tutorial/` directory. Screens are produced by the app's Storybook (`tutorial/screenshot.js` inside umsme) and must stay there.
 - **local** — tutorials authored directly in this repo under `content/`.
 - **gdrive** — tutorials authored in publicly-shared Google Docs. The sync downloads each doc's markdown export, decodes its inline base64 images into `sources/gdrive/tutorial/screens/`, flattens layout-grid tables, and strips trailing version-history sections. See [`AUTHORING-GDRIVE.md`](AUTHORING-GDRIVE.md) for the author-facing format spec.
+- **github** — tutorials authored as a directory inside a public GitHub repo, each with a main markdown file (default `README.md`) plus sibling image files. The sync clones the repo, copies the referenced images into `sources/github/tutorial/screens/`, and rewrites their links. Each tutorial names its own `repo`/`dir`/`ref`/`files`, so tutorials can live in different directories of one repo or across several repos. See [`AUTHORING-GITHUB.md`](AUTHORING-GITHUB.md) for the author-facing format spec.
 
 ## First-time setup
 
@@ -31,6 +32,7 @@ npm run dev
   - Re-running updates to the latest `master`.
   - `scripts/sync-umsme.sh --ref <branch|tag|sha>` syncs a specific ref instead.
 - `npm run sync:gdrive` — fetches each `{ source: "gdrive" }` tutorial in `tutorials.config.js` from Google Docs' markdown export, decodes inline base64 images, cleans the markdown (heading quirks, table flattening, trailing version-history removal), and writes to `sources/gdrive/tutorial/`. Per-doc sha256 hashes are recorded in `sources/gdrive/.synced-sha`. Each gdrive tutorial entry carries a `docs: { en?, sv? }` map of Google Doc IDs — single-language tutorials are allowed.
+- `npm run sync:github` — clones each repo referenced by a `{ source: "github" }` tutorial in `tutorials.config.js`, reads the main markdown file, copies its sibling images into `sources/github/tutorial/screens/` (named `<slug>__<file>`), rewrites the image links to `../screens/...`, and writes to `sources/github/tutorial/`. The checked-out commit SHA per `<repo>@<ref>` is recorded in `sources/github/.synced-sha`. Each github entry carries `repo`, optional `dir`/`ref`, and an optional `files: { en?, sv? }` map of main-file names per language — single-language tutorials are allowed. See [`AUTHORING-GITHUB.md`](AUTHORING-GITHUB.md).
 
 `sources/` is gitignored — upstream content never enters this repo's history.
 
@@ -58,6 +60,8 @@ template.html         # page shell
 site.css              # styles
 tutorials.config.js   # SOURCES, TAGS, TUTORIALS, DEFAULT_LANG
 scripts/sync-umsme.sh # umsme source loader
+scripts/sync-gdrive.js # gdrive source loader
+scripts/sync-github.js # github source loader
 content/              # locally-authored tutorials
 deploy/               # server-side auto-deploy (systemd timer)
 sources/              # gitignored — populated by sync scripts

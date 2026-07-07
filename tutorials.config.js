@@ -29,16 +29,32 @@ export const SOURCES = {
     screensDirs: ["screens"],
     requireSyncedSha: true,
   },
+  github: {
+    root: "sources/github/tutorial",
+    screensDirs: ["screens"],
+    requireSyncedSha: true,
+  },
 };
 
 export const TAGS = {
-  app:  { en: "Member app",    sv: "Medlemsapp" },
-  wood: { en: "Wood workshop", sv: "Träverkstad" },
+  app:     { en: "Member app",   sv: "Medlemsapp" },
+  wood:    { en: "Wood workshop", sv: "Träverkstad" },
+  print3d: { en: "3D printing",  sv: "3D-skrivare" },
 };
 
 // gdrive entries carry a `docs` map of Google Doc IDs per language. Either
 // `en`, `sv`, or both may be present — gdrive tutorials are allowed to ship
 // in a single language.
+//
+// github entries point at a directory inside a public repo:
+//   repo   git URL, cloned over HTTPS (required)
+//   dir    subdirectory within the repo (optional, default "" = repo root)
+//   ref    branch/tag/SHA to sync (optional, default the remote's HEAD)
+//   files  per-language main markdown file (optional, default
+//          { [DEFAULT_LANG]: "README.md" }); e.g. { sv: "README.md",
+//          en: "README.en.md" }. sync-github.js copies sibling images and
+//          rewrites their links to ../screens/. build.js reads only
+//          source/slug/tag; the rest is consumed by the sync script.
 export const TUTORIALS = [
   { source: "umsme",  slug: "installApp",      tag: "app" },
   { source: "umsme",  slug: "existingMembers", tag: "app" },
@@ -67,4 +83,7 @@ export const TUTORIALS = [
     docs: { sv: "1DWbM3UpMNX9zHnlnkc41-tg75ep3nHb5NqU42xRA_xk" } },
   { source: "gdrive", slug: "svarv",      tag: "wood",
     docs: { sv: "1xoyZ1sTCcVq-5w3SE9bZ1awssWszyOEIMX4l-TTP9YY" } },
+  { source: "github", slug: "prusa-install", tag: "print3d",
+    repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
+    dir: "docs/chapters/0_install_and_setup_prusa_slicer" },
 ];
