@@ -38,7 +38,6 @@ export const SOURCES = {
 
 export const TAGS = {
   app:     { en: "Member app",   sv: "Medlemsapp" },
-  arduino: { en: "Arduino",   sv: "Arduino" },
   wood:    { en: "Wood workshop", sv: "Träverkstad" },
   "3D": { en: "3D Workshop",  sv: "3D-verkstad" },
   electronics: { en: "Electronics workshop", sv: "Elektronikverkstad" }
@@ -96,12 +95,15 @@ export const TUTORIALS = [
   //{ source: "github", slug: "loerdagskurserna-kurser", tag: "3D",
   //  repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
   //  dir: "docs/kurserna" },
-  { source: "github", slug: "arduino-install", tag: "arduino",
+  { source: "github", slug: "arduino-install", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
     dir: "docs/kapitel/00_installera_arduino_iden" },
-  { source: "github", slug: "arduino-first-use", tag: "arduino",
+  { source: "github", slug: "arduino-first-use", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
     dir: "docs/kapitel/01_anvaendning_av_den_inbyggda_lysdioden" },
+  { source: "github", slug: "start-music", tag: "electronics",
+    repo: "https://github.com/richelbilderbeek/loedningskurs.git",
+    dir: "docs/chapters/0_setup_music/README.md" },
   { source: "github", slug: "prusa-print", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print" },
