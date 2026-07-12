@@ -45,7 +45,7 @@ for (const name of usedSources) {
     const shaPath = resolve(root, src.root, "..", ".synced-sha");
     if (!existsSync(shaPath)) {
       console.error(`error: source "${name}" not synced — run \`npm run sync\` first`);
-      // process.exit(1);
+      process.exit(1);
     }
   }
 }
