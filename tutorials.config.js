@@ -95,7 +95,8 @@ export const TUTORIALS = [
   //{ source: "github", slug: "loerdagskurserna-kurser", tag: "3D",
   //  repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
   //  dir: "docs/kurserna" },
-  { source: "github", slug: "arduino-install", tag: "electronics",
+// The following github is not public  
+/*  { source: "github", slug: "arduino-install", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
     dir: "docs/kapitel/00_installera_arduino_iden" },
   { source: "github", slug: "arduino-first-use", tag: "electronics",
@@ -109,7 +110,7 @@ export const TUTORIALS = [
     dir: "docs/chapters/0_setup/README.md" },
   { source: "github", slug: "your-first-soldering", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/loedningskurs.git",
-    dir: "docs/chapters/1_first_solder/README.md" },
+    dir: "docs/chapters/1_first_solder/README.md" },*/
   { source: "github", slug: "prusa-print", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print" },
