@@ -95,13 +95,15 @@ export const TUTORIALS = [
   //{ source: "github", slug: "loerdagskurserna-kurser", tag: "3D",
   //  repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
   //  dir: "docs/kurserna" },
-// The following github is not public  
-/*  { source: "github", slug: "arduino-install", tag: "electronics",
+  { source: "github", slug: "arduino-install", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
     dir: "docs/kapitel/00_installera_arduino_iden" },
   { source: "github", slug: "arduino-first-use", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
     dir: "docs/kapitel/01_anvaendning_av_den_inbyggda_lysdioden" },
+
+  // The following github is not public  
+/*
   { source: "github", slug: "start-music", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/loedningskurs.git",
     dir: "docs/chapters/0_setup_music/README.md" },
