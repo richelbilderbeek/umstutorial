@@ -101,18 +101,15 @@ export const TUTORIALS = [
   { source: "github", slug: "arduino-first-use", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
     dir: "docs/kapitel/01_anvaendning_av_den_inbyggda_lysdioden" },
-
-  // The following github is not public  
-/*
   { source: "github", slug: "start-music", tag: "electronics",
-    repo: "https://github.com/richelbilderbeek/loedningskurs.git",
-    dir: "docs/chapters/0_setup_music/README.md" },
+    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
+    dir: "docs/chapters/0_setup_music" },
   { source: "github", slug: "start-soldering", tag: "electronics",
-    repo: "https://github.com/richelbilderbeek/loedningskurs.git",
-    dir: "docs/chapters/0_setup/README.md" },
+    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
+    dir: "docs/chapters/0_setup" },
   { source: "github", slug: "your-first-soldering", tag: "electronics",
-    repo: "https://github.com/richelbilderbeek/loedningskurs.git",
-    dir: "docs/chapters/1_first_solder/README.md" },*/
+    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
+    dir: "docs/chapters/1_first_solder" },
   { source: "github", slug: "prusa-print", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print" },
