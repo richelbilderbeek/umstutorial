@@ -222,11 +222,37 @@ function rewriteImages(md, mdDir, cloneDir, slug) {
 // visible `\pagebreak` paragraphs. Same intent as the gdrive sync's drop-hr
 // rule. Collapse the blank lines left behind.
 function cleanup(md) {
-  return md
-    .replace(/^[ \t]*\\(pagebreak|newpage|clearpage)[ \t]*$/gim, "")
+  let t = md.replace(/^[ \t]*\\(pagebreak|newpage|clearpage)[ \t]*$/gim, "");
+  t = stripChapterNumbering(t);
+  return t
     .replace(/\n{3,}/g, "\n\n")
     .replace(/^\n+/, "")
     .replace(/\n+$/, "\n");
+}
+
+// These docs are chapters of a larger book, so headings carry the book's
+// chapter number: sections read `## 0.1. …`, `## 0.2. …`, and the title is
+// either `# 0. …` (bare number) or `# Lektion 0: …`. Standing alone as a single
+// tutorial that leading number is noise. We derive the chapter number X from a
+// hierarchical subheading `## X.Y …`, then drop the leading `X.` from every
+// heading that starts with it: `# 0. T` → `# T`, `## 0.1. T` → `## 1. T`. A
+// title like `# Lektion 0: …` doesn't start with `0.`, so it's left intact
+// while its `## 0.1.` sections still get renumbered to `## 1.`.
+function stripChapterNumbering(md) {
+  const lines = md.split("\n");
+
+  let x = null;
+  for (const l of lines) {
+    const m = /^#{2,6}\s+(\d+)\.\d/.exec(l);
+    if (m) {
+      x = m[1];
+      break;
+    }
+  }
+  if (x === null) return md;
+
+  const stripRe = new RegExp(`^(#{1,6}\\s+)${x}\\.\\s*`);
+  return lines.map((l) => l.replace(stripRe, "$1")).join("\n");
 }
 
 function isLocalRelative(src) {
