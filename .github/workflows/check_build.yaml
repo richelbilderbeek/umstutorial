@@ -1,0 +1,23 @@
+# Check that the website can be built, so pull requests surface build breakage.
+name: Check build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check_build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install prerequisites
+        run: npm ci
+
+      # All source repos are public, so this needs no SSH key or token:
+      # sync:umsme clones over HTTPS, sync:gdrive/sync:github fetch anonymously.
+      - name: sync sources
+        run: npm run sync
+
+      - name: build website
+        run: npm run build

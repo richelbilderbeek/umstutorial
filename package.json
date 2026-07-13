@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "sync:umsme": "scripts/sync-umsme.sh",
+    "sync:umsme": "scripts/sync-umsme.sh --https",
     "sync:gdrive": "node scripts/sync-gdrive.js",
     "sync:github": "node scripts/sync-github.js",
     "sync": "npm run sync:umsme && npm run sync:gdrive && npm run sync:github",
