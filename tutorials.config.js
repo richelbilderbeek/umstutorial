@@ -38,6 +38,7 @@ export const SOURCES = {
 
 export const TAGS = {
   app:     { en: "Member app",   sv: "Medlemsapp" },
+  courses: { en: "Courses",   sv: "Kurser" },
   wood:    { en: "Wood workshop", sv: "Träverkstad" },
   "3D": { en: "3D Workshop",  sv: "3D-verkstad" },
   electronics: { en: "Electronics workshop", sv: "Elektronikverkstad" }
@@ -95,6 +96,9 @@ export const TUTORIALS = [
   //{ source: "github", slug: "loerdagskurserna-kurser", tag: "3D",
   //  repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
   //  dir: "docs/kurserna" },
+  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "generated_en.md", sv: "generated_sv.md"}  },
   { source: "github", slug: "arduino-install", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
     dir: "docs/kapitel/00_installera_arduino_iden" },
