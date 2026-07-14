@@ -128,4 +128,8 @@ export const TUTORIALS = [
   { source: "github", slug: "prusa-print", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print" },
+  // docx documents posted on GitHubs does not work yet
+  // { source: "github", slug: "openscad-course-1", tag: "courses",
+  //   repo: "https://github.com/uppsala-makerspace/openscad_kurs.git",
+  //   dir: "docs", files: {sv: "10_mars_bok_1.docx" } },
 ];
