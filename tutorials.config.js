@@ -92,10 +92,6 @@ export const TUTORIALS = [
   { source: "github", slug: "prusa-install", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/0_install_and_setup_prusa_slicer" },
-  // A page that has tabs for different languages is displayed badly
-  //{ source: "github", slug: "loerdagskurserna-kurser", tag: "3D",
-  //  repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
-  //  dir: "docs/kurserna" },
   { source: "github", slug: "loerdagskurser-overview", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "generated_en.md", sv: "generated_sv.md"}  },
