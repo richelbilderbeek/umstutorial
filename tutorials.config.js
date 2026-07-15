@@ -97,15 +97,18 @@ export const TUTORIALS = [
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print" },
   // Electronics workshop
+  // Electronics workshop: Arduino
   { source: "github", slug: "arduino-install", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
-    dir: "docs/kapitel/00_installera_arduino_iden" },
+    dir: "docs/kapitel/00_installera_arduino_iden", files: { sv: "generated_sv.md"} },
   { source: "github", slug: "arduino-first-use", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
-    dir: "docs/kapitel/01_anvaendning_av_den_inbyggda_lysdioden" },
+    dir: "docs/kapitel/01_anvaendning_av_den_inbyggda_lysdioden", files: { sv: "generated_sv.md"} },
+  // Electronics workshop: Music installation
   { source: "github", slug: "start-music", tag: "electronics",
     repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
     dir: "docs/chapters/0_setup_music", files: {sv: "generated_sv.md"} },
+  // Electronics workshop: Soldering
   { source: "github", slug: "start-soldering", tag: "electronics",
     repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
     dir: "docs/chapters/0_setup", files: { sv: "generated_sv.md"} },
