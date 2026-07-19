@@ -119,6 +119,28 @@ export const TUTORIALS = [
   { source: "github", slug: "loerdagskurser-overview", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "generated_en.md", sv: "generated_sv.md"} },
+  // Saturday courses, courses
+  // Saturday courses, courses, Arduino
+  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_arduinokursen_generated_en.md", sv: "om_arduinokursen_generated_sv.md"} },
+  // Saturday courses, courses, Blender
+  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_blenderkursen_generated_en.md", sv: "om_blenderkursen_generated_sv.md"} },
+  // Saturday courses, courses, Matlagning
+  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_matlagningskursen_generated_en.md", sv: "om_matlagningskursen_generated_sv.md"} },
+  // Saturday courses, courses, OpenSCAD
+  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_openscad_kursen_generated_en.md", sv: "om_openscad_kursen_generated_sv.md"} },
+  // Saturday courses, courses, Programming
+  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_programmeringskursen_generated_en.md", sv: "om_programmeringskursen_generated_sv.md"} },
+  // Saturday courses, volunteers
   { source: "github", slug: "loerdagskurser-become-host", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/volontaerer", files: {en: "bli_entreevaerd_generated_en.md", sv: "bli_entreevaerd_generated_sv.md"} },
@@ -134,8 +156,4 @@ export const TUTORIALS = [
   { source: "github", slug: "loerdagskurser-volunteers", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/volontaerer", files: {en: "readme_generated_en.md", sv: "readme_generated_sv.md"} },
-  // docx documents posted on GitHubs does not work (yet?)
-  // { source: "github", slug: "openscad-course-1", tag: "courses",
-  //   repo: "https://github.com/uppsala-makerspace/openscad_kurs.git",
-  //   dir: "docs", files: {sv: "10_mars_bok_1.docx" } },
 ];
