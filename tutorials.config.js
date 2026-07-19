@@ -115,45 +115,58 @@ export const TUTORIALS = [
   { source: "github", slug: "your-first-soldering", tag: "electronics",
     repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
     dir: "docs/chapters/1_first_solder", files: { sv: "generated_sv.md"} },
+  //===========================================================================
   // Saturday courses
+  //===========================================================================
+  //----------------------------------------------------------------------------
+  // Saturday courses, the courses
+  //----------------------------------------------------------------------------
+  // Saturday courses, courses
   { source: "github", slug: "loerdagskurser-overview", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "generated_en.md", sv: "generated_sv.md"} },
   // Saturday courses, courses
   // Saturday courses, courses, Arduino
-  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+  { source: "github", slug: "about-arduino-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_arduinokursen_generated_en.md", sv: "om_arduinokursen_generated_sv.md"} },
   // Saturday courses, courses, Blender
-  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+  { source: "github", slug: "about-blender-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_blenderkursen_generated_en.md", sv: "om_blenderkursen_generated_sv.md"} },
   // Saturday courses, courses, Matlagning
-  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+  { source: "github", slug: "about-cooking-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_matlagningskursen_generated_en.md", sv: "om_matlagningskursen_generated_sv.md"} },
   // Saturday courses, courses, OpenSCAD
-  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+  { source: "github", slug: "about-openscad-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_openscad_kursen_generated_en.md", sv: "om_openscad_kursen_generated_sv.md"} },
   // Saturday courses, courses, Programming
-  { source: "github", slug: "loerdagskurser-overview", tag: "courses",
+  { source: "github", slug: "about-programming-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_programmeringskursen_generated_en.md", sv: "om_programmeringskursen_generated_sv.md"} },
-  // Saturday courses, volunteers
-  { source: "github", slug: "loerdagskurser-become-host", tag: "courses",
-    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
-    dir: "docs/volontaerer", files: {en: "bli_entreevaerd_generated_en.md", sv: "bli_entreevaerd_generated_sv.md"} },
-  { source: "github", slug: "loerdagskurser-become-course-leader", tag: "courses",
-    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
-    dir: "docs/volontaerer", files: {en: "bli_kursledare_generated_en.md", sv: "bli_kursledare_generated_sv.md"} },
-  { source: "github", slug: "loerdagskurser-become-teacher", tag: "courses",
-    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
-    dir: "docs/volontaerer", files: {en: "bli_laerare_generated_en.md", sv: "bli_laerare_generated_sv.md"} },
-  { source: "github", slug: "loerdagskurser-become-coordinator", tag: "courses",
-    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
-    dir: "docs/volontaerer", files: {en: "bli_samordnare_generated_en.md", sv: "bli_samordnare_generated_sv.md"} },
+  //----------------------------------------------------------------------------
+  // Saturday courses, the volunteers
+  //----------------------------------------------------------------------------
+  // Saturday courses, volunteers, general
   { source: "github", slug: "loerdagskurser-volunteers", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/volontaerer", files: {en: "readme_generated_en.md", sv: "readme_generated_sv.md"} },
+  // Saturday courses, volunteers, host
+  { source: "github", slug: "loerdagskurser-become-host", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/volontaerer", files: {en: "bli_entreevaerd_generated_en.md", sv: "bli_entreevaerd_generated_sv.md"} },
+  // Saturday courses, volunteers, course leader
+  { source: "github", slug: "loerdagskurser-become-course-leader", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/volontaerer", files: {en: "bli_kursledare_generated_en.md", sv: "bli_kursledare_generated_sv.md"} },
+  // Saturday courses, volunteers, course teacher
+  { source: "github", slug: "loerdagskurser-become-teacher", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/volontaerer", files: {en: "bli_laerare_generated_en.md", sv: "bli_laerare_generated_sv.md"} },
+  // Saturday courses, volunteers, course coordinator
+  { source: "github", slug: "loerdagskurser-become-coordinator", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/volontaerer", files: {en: "bli_samordnare_generated_en.md", sv: "bli_samordnare_generated_sv.md"} },
 ];
