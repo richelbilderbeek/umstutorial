@@ -89,10 +89,12 @@ export const TUTORIALS = [
     docs: { sv: "1GmmMhldnfo36J7JAJD0tFhjkG2T_MtZHYNRyHuAf8bs" } },
   { source: "gdrive", slug: "co2-laser",      tag: "3D",
     docs: { sv: "1Rys1KglTHSOFX4FKyP0mjbPVi05lBwM4otG0yGBpiM8" } },
+  //===========================================================================
   // 3D printer workshop
+  //===========================================================================
   { source: "github", slug: "prusa-install", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
-    dir: "docs/chapters/0_install_and_setup_prusa_slicer", files: { sv: "generated_sv.md"} },
+    dir: "docs/chapters/0_install_and_setup_prusa_slicer", files: { en: "generated_en.md", sv: "generated_sv.md"} },
   { source: "github", slug: "prusa-print", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print", files: { sv: "generated_sv.md"} },
