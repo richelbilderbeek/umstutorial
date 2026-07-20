@@ -94,10 +94,10 @@ export const TUTORIALS = [
   //===========================================================================
   { source: "github", slug: "prusa-install", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
-    dir: "docs/chapters/0_install_and_setup_prusa_slicer", files: { en: "generated_en.md", sv: "generated_sv.md"} },
+    dir: "docs/chapters/0_install_and_setup_prusa_slicer", files: { en: "generated_en.md", sv: "generated_sv.md" } },
   { source: "github", slug: "prusa-print", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
-    dir: "docs/chapters/1_print", files: { sv: "generated_sv.md"} },
+    dir: "docs/chapters/1_print", files: { en: "generated_en.md", sv: "generated_sv.md" } },
   // Electronics workshop
   // Electronics workshop: Arduino
   { source: "github", slug: "arduino-install", tag: "electronics",
