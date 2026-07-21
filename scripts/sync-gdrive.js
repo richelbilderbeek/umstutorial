@@ -48,6 +48,11 @@ const ORG_SUBTITLE = /^(uppsala\s*makerspace)$/i;
 // Picked to be unlikely to appear in real document content.
 const CELL_MARKER = " CELL ";
 const ROW_MARKER = " ROW ";
+// Newlines inside a cell (e.g. a bullet list in a layout grid) are encoded as
+// this sentinel so they survive the single-line pipe-table intermediate, then
+// decoded back when the table is flattened. A control char that won't occur in
+// document text and won't be touched by the whitespace-collapsing cell rule.
+const NL_MARKER = "\uE000";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -263,7 +268,12 @@ function makeTurndownService() {
   td.addRule("table-cell", {
     filter: ["td", "th"],
     replacement: (content) =>
-      content.trim().replace(/\s+/g, " ").replace(/\|/g, "\\|") + CELL_MARKER,
+      content
+        .trim()
+        .replace(/\|/g, "\\|")
+        .replace(/[^\S\n]+/g, " ") // collapse spaces/tabs, but keep newlines
+        .replace(/ *\n */g, NL_MARKER) // encode newlines (list/paragraph breaks)
+        + CELL_MARKER,
   });
   td.addRule("table-row", {
     filter: "tr",
@@ -438,15 +448,20 @@ function tableHasImages(seg) {
 }
 
 function serializeTable(seg) {
-  const ncols = Math.max(seg.header.length, ...seg.rows.map((r) => r.length));
+  // Genuine markdown table cells must stay single-line, so encoded newlines
+  // become spaces here.
+  const dec = (c) => c.split(NL_MARKER).join(" ");
+  const header = seg.header.map(dec);
+  const bodyRows = seg.rows.map((r) => r.map(dec));
+  const ncols = Math.max(header.length, ...bodyRows.map((r) => r.length));
   const pad = (r) => {
     const c = r.slice();
     while (c.length < ncols) c.push("");
     return c;
   };
-  const headerLine = "| " + pad(seg.header).join(" | ") + " |";
+  const headerLine = "| " + pad(header).join(" | ") + " |";
   const alignLine = "| " + Array(ncols).fill("---").join(" | ") + " |";
-  const rowLines = seg.rows.map((r) => "| " + pad(r).join(" | ") + " |");
+  const rowLines = bodyRows.map((r) => "| " + pad(r).join(" | ") + " |");
   return "\n" + [headerLine, alignLine, ...rowLines].join("\n") + "\n";
 }
 
@@ -455,7 +470,10 @@ function serializeTable(seg) {
 // we walk column-major so step+screenshot pairs stay adjacent. For anything
 // else (mixed rows, wider tables) we fall back to row-major.
 function flattenTable(seg) {
-  const rows = [seg.header, ...seg.rows];
+  // Flattened layout cells become free-flowing text, so restore encoded
+  // newlines — this keeps bullet lists and paragraphs inside a cell intact.
+  const dec = (c) => c.split(NL_MARKER).join("\n");
+  const rows = [seg.header, ...seg.rows].map((r) => r.map(dec));
   const ncols = Math.max(...rows.map((r) => r.length));
   const padded = rows.map((r) => {
     const c = r.slice();
