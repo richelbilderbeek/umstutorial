@@ -222,7 +222,11 @@ function rewriteImages(md, mdDir, cloneDir, slug) {
 // visible `\pagebreak` paragraphs. Same intent as the gdrive sync's drop-hr
 // rule. Collapse the blank lines left behind.
 function cleanup(md) {
-  let t = md.replace(/^[ \t]*\\(pagebreak|newpage|clearpage)[ \t]*$/gim, "");
+  // Drop HTML comments. build.js renders with html:false, so an `<!-- … -->`
+  // block (these docs wrap a mermaid diagram in one) would otherwise leak out
+  // as visible `<!--` / fenced-code / `-->` text instead of being hidden.
+  let t = md.replace(/<!--[\s\S]*?-->/g, "");
+  t = t.replace(/^[ \t]*\\(pagebreak|newpage|clearpage)[ \t]*$/gim, "");
   t = stripChapterNumbering(t);
   return t
     .replace(/\n{3,}/g, "\n\n")
