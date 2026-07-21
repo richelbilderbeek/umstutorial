@@ -98,7 +98,9 @@ export const TUTORIALS = [
   { source: "github", slug: "prusa-print", tag: "3D",
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print", files: { en: "generated_en.md", sv: "generated_sv.md" } },
+  //===========================================================================
   // Electronics workshop
+  //===========================================================================
   // Electronics workshop: Arduino
   { source: "github", slug: "arduino-install", tag: "electronics",
     repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
@@ -127,7 +129,10 @@ export const TUTORIALS = [
   { source: "github", slug: "loerdagskurser-overview", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "generated_en.md", sv: "generated_sv.md"} },
-  // Saturday courses, courses
+  // Saturday courses, courses, 3D printing
+  { source: "github", slug: "about-3d-printing-course", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_3d_skrivningskursen_generated_en.md", sv: "om_3d_skrivningskursen_generated_sv.md"} },
   // Saturday courses, courses, Arduino
   { source: "github", slug: "about-arduino-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
