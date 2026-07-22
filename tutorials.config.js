@@ -37,11 +37,12 @@ export const SOURCES = {
 };
 
 export const TAGS = {
+  "3D": { en: "3D Workshop",  sv: "3D-verkstad" },
   app:     { en: "Member app",   sv: "Medlemsapp" },
   courses: { en: "Courses",   sv: "Kurser" },
-  wood:    { en: "Wood workshop", sv: "Träverkstad" },
-  "3D": { en: "3D Workshop",  sv: "3D-verkstad" },
-  electronics: { en: "Electronics workshop", sv: "Elektronikverkstad" }
+  electronics: { en: "Electronics workshop", sv: "Elektronikverkstad" },
+  vinylcutter: { en: "Vinyl cutter", sv: "Vinylskärare" },
+  wood:    { en: "Wood workshop", sv: "Träverkstad" }
 };
 
 // gdrive entries carry a `docs` map of Google Doc IDs per language. Either
@@ -195,7 +196,7 @@ export const TUTORIALS = [
   //===========================================================================
   // Vinyl cutter
   //===========================================================================
-  { source: "github", slug: "connect-vinyl-cutter", tag: "courses",
+  { source: "github", slug: "connect-vinyl-cutter", tag: "vinylcutter",
     repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
     dir: "docs/steps", files: {en: "5_connect_vinyl_cutter.md"} },
 ];
