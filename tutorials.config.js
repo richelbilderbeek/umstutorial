@@ -141,18 +141,34 @@ export const TUTORIALS = [
   { source: "github", slug: "about-blender-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_blenderkursen_generated_en.md", sv: "om_blenderkursen_generated_sv.md"} },
-  // Saturday courses, courses, Matlagning
+  // Saturday courses, courses, Cooking
   { source: "github", slug: "about-cooking-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_matlagningskursen_generated_en.md", sv: "om_matlagningskursen_generated_sv.md"} },
+  // Saturday courses, courses, git
+  { source: "github", slug: "about-git-course", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_gitkursen_generated_en.md", sv: "om_gitkursen_generated_sv.md"} },
+  // Saturday courses, courses, laser cutter
+  { source: "github", slug: "about-laser-cutter-course", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_laserskaerarekursen_generated_en.md", sv: "om_laserskaerarekursen_generated_sv.md"} },
   // Saturday courses, courses, OpenSCAD
   { source: "github", slug: "about-openscad-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_openscad_kursen_generated_en.md", sv: "om_openscad_kursen_generated_sv.md"} },
-  // Saturday courses, courses, Programming
+  // Saturday courses, courses, programming
   { source: "github", slug: "about-programming-course", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/kurserna", files: {en: "om_programmeringskursen_generated_en.md", sv: "om_programmeringskursen_generated_sv.md"} },
+  // Saturday courses, courses, soldering
+  { source: "github", slug: "about-soldering-course", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_loedningskursen_generated_en.md", sv: "om_loedningskursen_generated_sv.md"} },
+  // Saturday courses, courses, vinyl cutter
+  { source: "github", slug: "about-vinyl-cutter-course", tag: "courses",
+    repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
+    dir: "docs/kurserna", files: {en: "om_vinylskaerarekursen_generated_en.md", sv: "om_vinylskaerarekursen_generated_sv.md"} },
   //----------------------------------------------------------------------------
   // Saturday courses, the volunteers
   //----------------------------------------------------------------------------
