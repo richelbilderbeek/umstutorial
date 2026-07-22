@@ -37,11 +37,12 @@ export const SOURCES = {
 };
 
 export const TAGS = {
+  "3D": { en: "3D Workshop",  sv: "3D-verkstad" },
   app:     { en: "Member app",   sv: "Medlemsapp" },
   courses: { en: "Courses",   sv: "Kurser" },
-  wood:    { en: "Wood workshop", sv: "Träverkstad" },
-  "3D": { en: "3D Workshop",  sv: "3D-verkstad" },
-  electronics: { en: "Electronics workshop", sv: "Elektronikverkstad" }
+  electronics: { en: "Electronics workshop", sv: "Elektronikverkstad" },
+  vinylcutter: { en: "Vinyl cutter", sv: "Vinylskärare" },
+  wood:    { en: "Wood workshop", sv: "Träverkstad" }
 };
 
 // gdrive entries carry a `docs` map of Google Doc IDs per language. Either
@@ -58,6 +59,71 @@ export const TAGS = {
 //          rewrites their links to ../screens/. build.js reads only
 //          source/slug/tag; the rest is consumed by the sync script.
 export const TUTORIALS = [
+  //===========================================================================
+  // Vinyl cutter
+  //===========================================================================
+  // Procedure
+  { source: "github", slug: "print-t-shirt-procedure", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "procedure_generated_en.md"} },
+  // 0. Check if Inkcut is already installed
+  { source: "github", slug: "check-inkcut-installed", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "0_check_generated_en.md"} },
+  // 1. Install Inkcut
+  { source: "github", slug: "install-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps/1_install_inkcut", files: {en: "generated_en.md"} },
+  // 2. Setup Inkcut
+  { source: "github", slug: "setup-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "2_setup_inkcut_generated_en.md"} },
+  // 3. Get T-shirts
+  { source: "github", slug: "get-t-shirts", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "3_get_t_shirts_generated_en.md"} },
+  // 4. Get vinyl
+  { source: "github", slug: "get-vinyl", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "4_get_vinyl_generated_en.md"} },
+  // 5. Connect vinyl cutter
+  { source: "github", slug: "connect-vinyl-cutter", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "5_connect_vinyl_cutter_generated_en.md"} },
+  // 6. Setup the vinyl cutter
+  { source: "github", slug: "setup-vinyl-cutter", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "6_setup_vinyl_cutter_generated_en.md"} },
+  // 7. Place foild
+  { source: "github", slug: "place-foil", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "7_place_foil_generated_en.md"} },
+  // 8. Setup Inkcut connection
+  { source: "github", slug: "setup-inkcut-connection", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "8_setup_inkcut_connection_generated_en.md"} },
+  // 9. Use Inkcut
+  { source: "github", slug: "use-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "9_use_inkcut_generated_en.md"} },
+  // 10. Setup the heat press
+  { source: "github", slug: "setup-heat-press", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "10_setup_heat_press_generated_en.md"} },
+  // 11. Peel vinyl
+  { source: "github", slug: "peel-vinyl", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "11_peel_vinyl_generated_en.md"} },
+  // 12. Transfer vinyl to T-shirt
+  { source: "github", slug: "transfer-vinyl-to-t-shirt", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "12_transfer_vinyl_to_t_shirt_generated_en.md"} },
+  // How to create an SVG for Inkcut
+  { source: "github", slug: "create-svg-for-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps/create_svg", files: {en: "generated_en.md"} },
+
+
   { source: "umsme",  slug: "installApp",      tag: "app" },
   { source: "umsme",  slug: "existingMembers", tag: "app" },
   { source: "umsme",  slug: "newMembers",      tag: "app" },
@@ -99,28 +165,7 @@ export const TUTORIALS = [
     repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
     dir: "docs/chapters/1_print", files: { en: "generated_en.md", sv: "generated_sv.md" } },
   //===========================================================================
-  // Electronics workshop
-  //===========================================================================
-  // Electronics workshop: Arduino
-  { source: "github", slug: "arduino-install", tag: "electronics",
-    repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
-    dir: "docs/kapitel/00_installera_arduino_iden", files: { sv: "generated_sv.md"} },
-  { source: "github", slug: "arduino-first-use", tag: "electronics",
-    repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
-    dir: "docs/kapitel/01_anvaendning_av_den_inbyggda_lysdioden", files: { sv: "generated_sv.md"} },
-  // Electronics workshop: Music installation
-  { source: "github", slug: "start-music", tag: "electronics",
-    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
-    dir: "docs/chapters/0_setup_music", files: {sv: "generated_sv.md"} },
-  // Electronics workshop: Soldering
-  { source: "github", slug: "start-soldering", tag: "electronics",
-    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
-    dir: "docs/chapters/0_setup", files: { sv: "generated_sv.md"} },
-  { source: "github", slug: "your-first-soldering", tag: "electronics",
-    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
-    dir: "docs/chapters/1_first_solder", files: { sv: "generated_sv.md"} },
-  //===========================================================================
-  // Saturday courses
+  // Courses
   //===========================================================================
   //----------------------------------------------------------------------------
   // Saturday courses, the courses
@@ -192,4 +237,25 @@ export const TUTORIALS = [
   { source: "github", slug: "loerdagskurser-become-coordinator", tag: "courses",
     repo: "https://github.com/uppsala-makerspace/loerdagskurser.git",
     dir: "docs/volontaerer", files: {en: "bli_samordnare_generated_en.md", sv: "bli_samordnare_generated_sv.md"} },
+  //===========================================================================
+  // Electronics workshop
+  //===========================================================================
+  // Electronics workshop: Arduino
+  { source: "github", slug: "arduino-install", tag: "electronics",
+    repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
+    dir: "docs/kapitel/00_installera_arduino_iden", files: { sv: "generated_sv.md"} },
+  { source: "github", slug: "arduino-first-use", tag: "electronics",
+    repo: "https://github.com/richelbilderbeek/arduino_foer_ungdomar.git",
+    dir: "docs/kapitel/01_anvaendning_av_den_inbyggda_lysdioden", files: { sv: "generated_sv.md"} },
+  // Electronics workshop: Music installation
+  { source: "github", slug: "start-music", tag: "electronics",
+    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
+    dir: "docs/chapters/0_setup_music", files: {sv: "generated_sv.md"} },
+  // Electronics workshop: Soldering
+  { source: "github", slug: "start-soldering", tag: "electronics",
+    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
+    dir: "docs/chapters/0_setup", files: { sv: "generated_sv.md"} },
+  { source: "github", slug: "your-first-soldering", tag: "electronics",
+    repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
+    dir: "docs/chapters/1_first_solder", files: { sv: "generated_sv.md"} },
 ];
