@@ -196,7 +196,64 @@ export const TUTORIALS = [
   //===========================================================================
   // Vinyl cutter
   //===========================================================================
+  // Procedure
+  { source: "github", slug: "print-t-shirt-procedure", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "procedure"} },
+  // 0. Check if Inkcut is already installed
+  { source: "github", slug: "check-inkcut-installed", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "0_check.md"} },
+  // 1. Install Inkcut
+  { source: "github", slug: "install-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "1_install_inkcut.md"} },
+  // 2. Setup Inkcut
+  { source: "github", slug: "setup-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "2_setup_inkcut.md"} },
+  // 3. Get T-shirts
+  { source: "github", slug: "get-t-shirts", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "3_get_t_shirts.md"} },
+  // 4. Get vinyl
+  { source: "github", slug: "get-vinyl", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "4_get_vinyl.md"} },
+  // 5. Connect vinyl cutter
   { source: "github", slug: "connect-vinyl-cutter", tag: "vinylcutter",
     repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
     dir: "docs/steps", files: {en: "5_connect_vinyl_cutter.md"} },
+  // 6. Setup the vinyl cutter
+  { source: "github", slug: "setup-vinyl-cutter", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "6_setup_vinyl_cutter.md"} },
+  // 7. Place foild
+  { source: "github", slug: "place-foil", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "7_place_foil.md"} },
+  // 8. Setup Inkcut connection
+  { source: "github", slug: "setup-inkcut-connection", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "8_setup_inkcut_connection.md"} },
+  // 9. Use Inkcut
+  { source: "github", slug: "use-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "9_use_inkcut.md"} },
+  // 10. Setup the heat press
+  { source: "github", slug: "setup-heat-press", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "10_setup_heat_press.md"} },
+  // 11. Peel vinyl
+  { source: "github", slug: "peel-vinyl", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "11_peel_vinyl.md"} },
+  // 12. Transfer vinyl to T-shirt
+  { source: "github", slug: "transfer-vinyl-to-t-shirt", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "12_transfer_vinyl_to_t_shirt.md"} },
+  // How to create an SVG for Inkcut
+  { source: "github", slug: "create-svg-for-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "create_svg.md"} },
 ];
