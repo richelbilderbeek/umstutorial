@@ -41,6 +41,7 @@ export const TAGS = {
   app:     { en: "Member app",   sv: "Medlemsapp" },
   courses: { en: "Courses",   sv: "Kurser" },
   electronics: { en: "Electronics workshop", sv: "Elektronikverkstad" },
+  misc: { en: "Miscellaneous", sv: "Diverse" },
   vinylcutter: { en: "Vinyl cutter", sv: "Vinylskärare" },
   wood:    { en: "Wood workshop", sv: "Träverkstad" }
 };
@@ -60,70 +61,19 @@ export const TAGS = {
 //          source/slug/tag; the rest is consumed by the sync script.
 export const TUTORIALS = [
   //===========================================================================
-  // Vinyl cutter
+  // 3D printer workshop
   //===========================================================================
-  // Procedure
-  { source: "github", slug: "print-t-shirt-procedure", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "procedure_generated_en.md"} },
-  // 0. Check if Inkcut is already installed
-  { source: "github", slug: "check-inkcut-installed", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "0_check_generated_en.md"} },
-  // 1. Install Inkcut
-  { source: "github", slug: "install-inkcut", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps/1_install_inkcut", files: {en: "generated_en.md"} },
-  // 2. Setup Inkcut
-  { source: "github", slug: "setup-inkcut", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "2_setup_inkcut_generated_en.md"} },
-  // 3. Get T-shirts
-  { source: "github", slug: "get-t-shirts", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "3_get_t_shirts_generated_en.md"} },
-  // 4. Get vinyl
-  { source: "github", slug: "get-vinyl", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "4_get_vinyl_generated_en.md"} },
-  // 5. Connect vinyl cutter
-  { source: "github", slug: "connect-vinyl-cutter", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "5_connect_vinyl_cutter_generated_en.md"} },
-  // 6. Setup the vinyl cutter
-  { source: "github", slug: "setup-vinyl-cutter", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "6_setup_vinyl_cutter_generated_en.md"} },
-  // 7. Place foild
-  { source: "github", slug: "place-foil", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "7_place_foil_generated_en.md"} },
-  // 8. Setup Inkcut connection
-  { source: "github", slug: "setup-inkcut-connection", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "8_setup_inkcut_connection_generated_en.md"} },
-  // 9. Use Inkcut
-  { source: "github", slug: "use-inkcut", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "9_use_inkcut_generated_en.md"} },
-  // 10. Setup the heat press
-  { source: "github", slug: "setup-heat-press", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "10_setup_heat_press_generated_en.md"} },
-  // 11. Peel vinyl
-  { source: "github", slug: "peel-vinyl", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "11_peel_vinyl_generated_en.md"} },
-  // 12. Transfer vinyl to T-shirt
-  { source: "github", slug: "transfer-vinyl-to-t-shirt", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps", files: {en: "12_transfer_vinyl_to_t_shirt_generated_en.md"} },
-  // How to create an SVG for Inkcut
-  { source: "github", slug: "create-svg-for-inkcut", tag: "vinylcutter",
-    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
-    dir: "docs/steps/create_svg", files: {en: "generated_en.md"} },
-
-
+  { source: "gdrive", slug: "co2-laser",      tag: "3D",
+    docs: { sv: "1Rys1KglTHSOFX4FKyP0mjbPVi05lBwM4otG0yGBpiM8" } },
+  { source: "github", slug: "prusa-install", tag: "3D",
+    repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
+    dir: "docs/chapters/0_install_and_setup_prusa_slicer", files: { en: "generated_en.md", sv: "generated_sv.md" } },
+  { source: "github", slug: "prusa-print", tag: "3D",
+    repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
+    dir: "docs/chapters/1_print", files: { en: "generated_en.md", sv: "generated_sv.md" } },
+  //===========================================================================
+  // app
+  //===========================================================================
   { source: "umsme",  slug: "installApp",      tag: "app" },
   { source: "umsme",  slug: "existingMembers", tag: "app" },
   { source: "umsme",  slug: "newMembers",      tag: "app" },
@@ -131,39 +81,6 @@ export const TUTORIALS = [
   { source: "umsme",  slug: "manageFamily",    tag: "app" },
   { source: "gdrive", slug: "bordsfras",       tag: "wood",
     docs: { sv: "1ZKIZjf7V9i8bYpIoVCvN7bWZWBTNNh3uSqt3Y2GoHdw" } },
-  { source: "gdrive", slug: "bandslipen",      tag: "wood",
-    docs: { sv: "1iaDMeP2SLS92Z3N5Bexv51c_tZeQYJwaSVquJPmFxvY" } },
-  { source: "gdrive", slug: "bordssag",      tag: "wood",
-    docs: { sv: "1tl-2MF4t7SjDfPqiCY4RUoeawATpwx_Nu7nJAMGkodA" } },
-  { source: "gdrive", slug: "bandssag-liten",      tag: "wood",
-    docs: { sv: "1l9_gzDCnJWv599O2cOS3L0Om5aXipxYNI9xdnBqv-ww" } },
-  { source: "gdrive", slug: "bandssag-stor",      tag: "wood",
-    docs: { sv: "1m8AyFN5he_tnVZrfX3Vr3gfaZcIx9XbUizodK6NT1bg" } },
-  { source: "gdrive", slug: "bordssag-liten",      tag: "wood",
-    docs: { sv: "1rko_Itm3ctTaY380f2kkIQU-rDqZ4IIdgO2qA2Zl-lM" } },
-  { source: "gdrive", slug: "kap-och-gersag",      tag: "wood",
-    docs: { sv: "1IKfLPYiFgGwTZGgOBVXARnNbYc88R_-VMWXMeQpqEe8" } },
-  { source: "gdrive", slug: "figursag",      tag: "wood",
-    docs: { sv: "1tngfynJiae7yydLWVCVApQBAfY807-RSBb34gSADN9U" } },
-  { source: "gdrive", slug: "pelarborr",      tag: "wood",
-    docs: { sv: "1ravwP4H55TGArYpeTDqDQv6elldbfn6nPcRVQm_yCC0" } },
-  { source: "gdrive", slug: "trumslip",      tag: "wood",
-    docs: { sv: "1DWbM3UpMNX9zHnlnkc41-tg75ep3nHb5NqU42xRA_xk" } },
-  { source: "gdrive", slug: "svarv",      tag: "wood",
-    docs: { sv: "1xoyZ1sTCcVq-5w3SE9bZ1awssWszyOEIMX4l-TTP9YY" } },
-  { source: "gdrive", slug: "punktsvets",      tag: "electronics",
-    docs: { sv: "1GmmMhldnfo36J7JAJD0tFhjkG2T_MtZHYNRyHuAf8bs" } },
-  { source: "gdrive", slug: "co2-laser",      tag: "3D",
-    docs: { sv: "1Rys1KglTHSOFX4FKyP0mjbPVi05lBwM4otG0yGBpiM8" } },
-  //===========================================================================
-  // 3D printer workshop
-  //===========================================================================
-  { source: "github", slug: "prusa-install", tag: "3D",
-    repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
-    dir: "docs/chapters/0_install_and_setup_prusa_slicer", files: { en: "generated_en.md", sv: "generated_sv.md" } },
-  { source: "github", slug: "prusa-print", tag: "3D",
-    repo: "https://github.com/uppsala-makerspace/3d_skrivningskurs.git",
-    dir: "docs/chapters/1_print", files: { en: "generated_en.md", sv: "generated_sv.md" } },
   //===========================================================================
   // Courses
   //===========================================================================
@@ -258,4 +175,102 @@ export const TUTORIALS = [
   { source: "github", slug: "your-first-soldering", tag: "electronics",
     repo: "https://github.com/uppsala-makerspace/loedningskurs.git",
     dir: "docs/chapters/1_first_solder", files: { sv: "generated_sv.md"} },
+  // Electronics workshop: spotwelder
+  { source: "gdrive", slug: "punktsvets",      tag: "electronics",
+    docs: { sv: "1GmmMhldnfo36J7JAJD0tFhjkG2T_MtZHYNRyHuAf8bs" } },
+
+  //===========================================================================
+  // Misc
+  //===========================================================================
+  // Misc: connect to local file server
+  { source: "github", slug: "connect-to-ums-file-server", tag: "misc",
+    repo: "https://github.com/uppsala-makerspace/umstutorials.git",
+    dir: "connect_to_local_file_server", files: {en: "README.md"} },
+
+  //===========================================================================
+  // Vinyl cutter
+  //===========================================================================
+  // Procedure
+  { source: "github", slug: "print-t-shirt-procedure", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "procedure_generated_en.md"} },
+  // 0. Check if Inkcut is already installed
+  { source: "github", slug: "check-inkcut-installed", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "0_check_generated_en.md"} },
+  // 1. Install Inkcut
+  { source: "github", slug: "install-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps/1_install_inkcut", files: {en: "generated_en.md"} },
+  // 2. Setup Inkcut
+  { source: "github", slug: "setup-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "2_setup_inkcut_generated_en.md"} },
+  // 3. Get T-shirts
+  { source: "github", slug: "get-t-shirts", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "3_get_t_shirts_generated_en.md"} },
+  // 4. Get vinyl
+  { source: "github", slug: "get-vinyl", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "4_get_vinyl_generated_en.md"} },
+  // 5. Connect vinyl cutter
+  { source: "github", slug: "connect-vinyl-cutter", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "5_connect_vinyl_cutter_generated_en.md"} },
+  // 6. Setup the vinyl cutter
+  { source: "github", slug: "setup-vinyl-cutter", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "6_setup_vinyl_cutter_generated_en.md"} },
+  // 7. Place foild
+  { source: "github", slug: "place-foil", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "7_place_foil_generated_en.md"} },
+  // 8. Setup Inkcut connection
+  { source: "github", slug: "setup-inkcut-connection", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "8_setup_inkcut_connection_generated_en.md"} },
+  // 9. Use Inkcut
+  { source: "github", slug: "use-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "9_use_inkcut_generated_en.md"} },
+  // 10. Setup the heat press
+  { source: "github", slug: "setup-heat-press", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "10_setup_heat_press_generated_en.md"} },
+  // 11. Peel vinyl
+  { source: "github", slug: "peel-vinyl", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "11_peel_vinyl_generated_en.md"} },
+  // 12. Transfer vinyl to T-shirt
+  { source: "github", slug: "transfer-vinyl-to-t-shirt", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps", files: {en: "12_transfer_vinyl_to_t_shirt_generated_en.md"} },
+  // How to create an SVG for Inkcut
+  { source: "github", slug: "create-svg-for-inkcut", tag: "vinylcutter",
+    repo: "https://github.com/uppsala-makerspace/vevor_vinyl_cutter_to_t_shirt_manual.git",
+    dir: "docs/steps/create_svg", files: {en: "generated_en.md"} },
+  //===========================================================================
+  // Wood
+  //===========================================================================
+  { source: "gdrive", slug: "bandslipen",      tag: "wood",
+    docs: { sv: "1iaDMeP2SLS92Z3N5Bexv51c_tZeQYJwaSVquJPmFxvY" } },
+  { source: "gdrive", slug: "bordssag",      tag: "wood",
+    docs: { sv: "1tl-2MF4t7SjDfPqiCY4RUoeawATpwx_Nu7nJAMGkodA" } },
+  { source: "gdrive", slug: "bandssag-liten",      tag: "wood",
+    docs: { sv: "1l9_gzDCnJWv599O2cOS3L0Om5aXipxYNI9xdnBqv-ww" } },
+  { source: "gdrive", slug: "bandssag-stor",      tag: "wood",
+    docs: { sv: "1m8AyFN5he_tnVZrfX3Vr3gfaZcIx9XbUizodK6NT1bg" } },
+  { source: "gdrive", slug: "bordssag-liten",      tag: "wood",
+    docs: { sv: "1rko_Itm3ctTaY380f2kkIQU-rDqZ4IIdgO2qA2Zl-lM" } },
+  { source: "gdrive", slug: "kap-och-gersag",      tag: "wood",
+    docs: { sv: "1IKfLPYiFgGwTZGgOBVXARnNbYc88R_-VMWXMeQpqEe8" } },
+  { source: "gdrive", slug: "figursag",      tag: "wood",
+    docs: { sv: "1tngfynJiae7yydLWVCVApQBAfY807-RSBb34gSADN9U" } },
+  { source: "gdrive", slug: "pelarborr",      tag: "wood",
+    docs: { sv: "1ravwP4H55TGArYpeTDqDQv6elldbfn6nPcRVQm_yCC0" } },
+  { source: "gdrive", slug: "trumslip",      tag: "wood",
+    docs: { sv: "1DWbM3UpMNX9zHnlnkc41-tg75ep3nHb5NqU42xRA_xk" } },
+  { source: "gdrive", slug: "svarv",      tag: "wood",
+    docs: { sv: "1xoyZ1sTCcVq-5w3SE9bZ1awssWszyOEIMX4l-TTP9YY" } },
 ];
