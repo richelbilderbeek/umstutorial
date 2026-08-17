@@ -185,8 +185,7 @@ export const TUTORIALS = [
   // Misc: connect to local file server
   { source: "github", slug: "connect-to-ums-file-server", tag: "misc",
     repo: "https://github.com/uppsala-makerspace/umstutorials.git",
-    dir: "connect_to_local_file_server", files: {en: "README.md"} },
-
+    dir: "connect_to_local_file_server", files: {en: "connect_to_local_file_server_en.md", sv: "connect_to_local_file_server_sv.md"} },
   //===========================================================================
   // Vinyl cutter
   //===========================================================================
